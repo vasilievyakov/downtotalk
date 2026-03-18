@@ -34,7 +34,7 @@ export const users = pgTable("users", {
   monitoredServices: jsonb("monitored_services")
     .$type<string[]>()
     .default(["claude", "openai", "gemini"]),
-  githubAccessToken: text("github_access_token"),
+  telegramChatId: text("telegram_chat_id"),
   isAvailable: boolean("is_available").default(false),
   availableSince: timestamp("available_since", { mode: "date" }),
   lastSeenAt: timestamp("last_seen_at", { mode: "date" }),
@@ -118,6 +118,7 @@ export const notifications = pgTable("notifications", {
     .notNull()
     .references(() => users.id),
   type: text("type").notNull(), // "downtime" | "someone_free" | "connection_request"
+  channel: text("channel").default("in_app"), // "in_app" | "telegram"
   payload: jsonb("payload"),
   sentAt: timestamp("sent_at", { mode: "date" }).defaultNow(),
   readAt: timestamp("read_at", { mode: "date" }),
@@ -147,6 +148,16 @@ export const circles = pgTable("circles", {
     .references(() => users.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   inviteCode: text("invite_code").unique().notNull(),
+  createdAt: timestamp("created_at", { mode: "date" }).defaultNow(),
+});
+
+// ──────────────────────────────────────────
+// Waitlist (pre-launch email collection)
+// ──────────────────────────────────────────
+
+export const waitlist = pgTable("waitlist", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  email: text("email").unique().notNull(),
   createdAt: timestamp("created_at", { mode: "date" }).defaultNow(),
 });
 
