@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
-import { rateLimitEvents, users, connections } from "@/db/schema";
-import { eq, gte, and, sql, count } from "drizzle-orm";
+import { rateLimitEvents, users, connections, circleMemberships } from "@/db/schema";
+import { eq, gte, and, sql, count, inArray } from "drizzle-orm";
+import { notifyCircleMembers } from "@/lib/telegram";
 
 export async function POST(request: NextRequest) {
   const session = await auth();
@@ -10,7 +11,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { service } = await request.json();
+  let body;
+  try { body = await request.json(); } catch {
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+  }
+  const { service } = body;
   if (!["claude", "openai", "gemini"].includes(service)) {
     return NextResponse.json({ error: "Invalid service" }, { status: 400 });
   }
@@ -31,15 +36,40 @@ export async function POST(request: NextRequest) {
     })
     .where(eq(users.id, session.user.id));
 
-  // Count others who are available
-  const availableUsers = await db
-    .select({ count: count() })
-    .from(users)
-    .where(
-      and(eq(users.isAvailable, true), sql`${users.id} != ${session.user.id}`)
-    );
+  // Notify circle members via Telegram
+  const currentUser = await db.query.users.findFirst({
+    where: eq(users.id, session.user.id),
+    columns: { name: true },
+  });
+  const serviceName =
+    service === "claude" ? "Claude" : service === "openai" ? "ChatGPT" : "Gemini";
+  notifyCircleMembers(
+    session.user.id,
+    `${currentUser?.name || "Someone"} is free \u2014 hit the ${serviceName} limit.\n\nJoin: downtotalk.com/dashboard`
+  ).catch(() => {}); // fire-and-forget
 
-  const othersAvailable = availableUsers[0]?.count || 0;
+  // Count others who are available (within shared circles only)
+  const myMemberships = await db.query.circleMemberships.findMany({
+    where: eq(circleMemberships.userId, session.user.id),
+    columns: { circleId: true },
+  });
+  const myCircleIds = myMemberships.map((m) => m.circleId);
+
+  let othersAvailable = 0;
+  if (myCircleIds.length > 0) {
+    const fellowMembers = await db.query.circleMemberships.findMany({
+      where: inArray(circleMemberships.circleId, myCircleIds),
+      columns: { userId: true },
+    });
+    const fellowIds = [...new Set(fellowMembers.map((m) => m.userId).filter((id) => id !== session.user!.id))];
+    if (fellowIds.length > 0) {
+      const availableUsers = await db
+        .select({ count: count() })
+        .from(users)
+        .where(and(eq(users.isAvailable, true), inArray(users.id, fellowIds)));
+      othersAvailable = availableUsers[0]?.count || 0;
+    }
+  }
 
   return NextResponse.json({
     ok: true,
@@ -49,6 +79,11 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET() {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const now = new Date();
   const thirtyMinAgo = new Date(now.getTime() - 30 * 60 * 1000);
   const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);

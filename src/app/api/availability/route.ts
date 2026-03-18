@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { users, circleMemberships } from "@/db/schema";
 import { eq, and, inArray } from "drizzle-orm";
+import { notifyCircleMembers } from "@/lib/telegram";
 
 export async function POST(request: NextRequest) {
   const session = await auth();
@@ -10,7 +11,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { isAvailable } = await request.json();
+  let body;
+  try { body = await request.json(); } catch {
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+  }
+  const { isAvailable } = body;
+
+  if (typeof isAvailable !== "boolean") {
+    return NextResponse.json({ error: "isAvailable must be boolean" }, { status: 400 });
+  }
 
   await db
     .update(users)
@@ -20,6 +29,18 @@ export async function POST(request: NextRequest) {
       lastSeenAt: new Date(),
     })
     .where(eq(users.id, session.user.id));
+
+  // Notify circle members when becoming available
+  if (isAvailable) {
+    const currentUser = await db.query.users.findFirst({
+      where: eq(users.id, session.user.id),
+      columns: { name: true },
+    });
+    notifyCircleMembers(
+      session.user.id,
+      `${currentUser?.name || "Someone"} is now available to talk.\n\nJoin: downtotalk.com/dashboard`
+    ).catch(() => {}); // fire-and-forget
+  }
 
   return NextResponse.json({ ok: true, isAvailable });
 }
@@ -73,7 +94,6 @@ export async function GET() {
       city: true,
       timezone: true,
       preferredPlatforms: true,
-      telegramHandle: true,
       availableSince: true,
     },
   });

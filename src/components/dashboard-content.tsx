@@ -24,6 +24,7 @@ interface UserProfile {
   timezone: string | null;
   city: string | null;
   isAvailable: boolean;
+  telegramChatId: string | null;
 }
 
 interface Circle {
@@ -56,34 +57,48 @@ export function DashboardContent({ user }: { user: User }) {
     othersAvailable: number;
   } | null>(null);
   const [rateLimitLoading, setRateLimitLoading] = useState<string | null>(null);
+  const [selectedService, setSelectedService] = useState("claude");
+  const [error, setError] = useState<string | null>(null);
 
   const fetchStatuses = useCallback(async () => {
-    const res = await fetch("/api/status");
-    const data = await res.json();
-    setStatuses(data.statuses);
+    try {
+      const res = await fetch("/api/status");
+      const data = await res.json();
+      setStatuses(data.statuses);
+    } catch {
+      setError("Failed to load AI status.");
+    }
   }, []);
 
   const fetchProfile = useCallback(async () => {
-    const res = await fetch("/api/users/profile");
-    const data = await res.json();
-    if (data.user) {
-      setProfile(data.user);
-      setIsAvailable(data.user.isAvailable || false);
-      if (
-        !data.user.telegramHandle &&
-        !data.user.whatsappNumber &&
-        !data.user.zoomLink
-      ) {
-        setShowProfile(true);
+    try {
+      const res = await fetch("/api/users/profile");
+      const data = await res.json();
+      if (data.user) {
+        setProfile(data.user);
+        setIsAvailable(data.user.isAvailable || false);
+        if (
+          !data.user.telegramHandle &&
+          !data.user.whatsappNumber &&
+          !data.user.zoomLink
+        ) {
+          setShowProfile(true);
+        }
       }
+    } catch {
+      setError("Failed to load your profile.");
     }
   }, []);
 
   const fetchCircles = useCallback(async () => {
-    const res = await fetch("/api/circles");
-    const data = await res.json();
-    if (data.circles) {
-      setCircles(data.circles);
+    try {
+      const res = await fetch("/api/circles");
+      const data = await res.json();
+      if (data.circles) {
+        setCircles(data.circles);
+      }
+    } catch {
+      // Non-critical — circles section will show empty state
     }
   }, []);
 
@@ -203,6 +218,36 @@ export function DashboardContent({ user }: { user: User }) {
         </div>
       </div>
 
+      {/* Error banner */}
+      {error && (
+        <div className="rounded-xl border border-red/30 bg-red/5 p-4 mb-6 text-center">
+          <p className="text-red text-sm">{error}</p>
+          <button
+            onClick={() => { setError(null); fetchStatuses(); fetchProfile(); }}
+            className="text-xs text-muted hover:text-foreground mt-2 underline cursor-pointer"
+          >
+            Retry
+          </button>
+        </div>
+      )}
+
+      {/* Telegram notification banner */}
+      {profile && !profile.telegramChatId && !showProfile && (
+        <div className="rounded-xl border border-[#2AABEE]/30 bg-[#2AABEE]/5 p-4 mb-6 flex items-center justify-between">
+          <p className="text-sm">
+            Get notified when someone&apos;s free to talk.
+          </p>
+          <a
+            href={`https://t.me/DownToTalkBot?start=${profile.id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs px-3 py-1.5 rounded-lg bg-[#2AABEE] text-white hover:opacity-90 transition-opacity whitespace-nowrap"
+          >
+            Enable Telegram
+          </a>
+        </div>
+      )}
+
       {/* Profile Setup (expandable) */}
       {showProfile && (
         <ProfileSetup
@@ -257,17 +302,36 @@ export function DashboardContent({ user }: { user: User }) {
             </p>
           </div>
         ) : (
-          <button
-            onClick={() => reportRateLimit("claude")}
-            disabled={rateLimitLoading !== null}
-            className="w-full py-4 rounded-xl text-lg font-bold transition-all cursor-pointer disabled:opacity-50"
-            style={{
-              background: "linear-gradient(135deg, #E86235 0%, #E04343 100%)",
-              color: "#fff",
-            }}
-          >
-            {rateLimitLoading ? "..." : "I hit my limit"}
-          </button>
+          <div className="flex gap-2">
+            <select
+              value={selectedService}
+              onChange={(e) => setSelectedService(e.target.value)}
+              className="px-3 py-4 rounded-xl bg-card border border-card-border text-sm font-medium cursor-pointer focus:outline-none focus:border-green"
+            >
+              {(profile?.monitoredServices || ["claude", "openai", "gemini"]).map(
+                (svc) => (
+                  <option key={svc} value={svc}>
+                    {svc === "claude"
+                      ? "Claude"
+                      : svc === "openai"
+                        ? "ChatGPT"
+                        : "Gemini"}
+                  </option>
+                )
+              )}
+            </select>
+            <button
+              onClick={() => reportRateLimit(selectedService)}
+              disabled={rateLimitLoading !== null}
+              className="flex-1 py-4 rounded-xl text-lg font-bold transition-all cursor-pointer disabled:opacity-50"
+              style={{
+                background: "linear-gradient(135deg, #E86235 0%, #E04343 100%)",
+                color: "#fff",
+              }}
+            >
+              {rateLimitLoading ? "..." : "I hit my limit"}
+            </button>
+          </div>
         )}
       </div>
 

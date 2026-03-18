@@ -13,6 +13,7 @@ interface UserProfile {
   timezone: string | null;
   city: string | null;
   isAvailable: boolean;
+  telegramChatId: string | null;
 }
 
 export function ProfileSetup({
@@ -117,6 +118,32 @@ export function ProfileSetup({
       >
         {saving ? "Saving..." : "Save profile"}
       </button>
+
+      {/* Telegram notifications */}
+      <div className="mt-6 pt-4 border-t border-card-border">
+        <h3 className="text-sm font-medium mb-1">Telegram notifications</h3>
+        {profile?.telegramChatId ? (
+          <p className="text-sm text-green">
+            &#10003; Connected — you&apos;ll get notified when someone in your circles is free.
+          </p>
+        ) : (
+          <>
+            <p className="text-sm text-muted mb-3">
+              Get notified instantly when someone in your circles becomes available or when an AI service goes down.
+            </p>
+            {profile?.id && (
+              <a
+                href={`https://t.me/DownToTalkBot?start=${profile.id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block px-4 py-2 rounded-lg bg-[#2AABEE] text-white text-sm font-medium hover:opacity-90 transition-opacity"
+              >
+                Enable notifications
+              </a>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 }

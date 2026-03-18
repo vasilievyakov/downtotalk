@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/outage-notify",
+      "schedule": "*/5 * * * *"
+    }
+  ]
+}
