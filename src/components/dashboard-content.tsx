@@ -159,9 +159,9 @@ export function DashboardContent({ user }: { user: User }) {
     <main className="min-h-screen max-w-3xl mx-auto px-6 py-8">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-xl font-bold">
+        <a href="/" className="text-xl font-bold hover:opacity-80 transition-opacity">
           Down<span className="text-green">To</span>Talk
-        </h1>
+        </a>
         <div className="flex items-center gap-4">
           <button
             onClick={() => setShowProfile(!showProfile)}
