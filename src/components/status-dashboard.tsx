@@ -48,18 +48,24 @@ export function StatusDashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [statusRes, availRes, rlRes] = await Promise.all([
-          fetch("/api/status"),
+        const statusRes = await fetch("/api/status");
+        const statusData = await statusRes.json();
+        setServices(statusData.statuses);
+
+        // These require auth — graceful fallback for landing page
+        const [availRes, rlRes] = await Promise.all([
           fetch("/api/availability"),
           fetch("/api/rate-limited"),
         ]);
-        const statusData = await statusRes.json();
-        const availData = await availRes.json();
-        const rlData = await rlRes.json();
-        setServices(statusData.statuses);
-        setAvailableCount(availData.count || 0);
-        setRateLimitedCount(rlData.hourCount || 0);
-        setConnectionsToday(rlData.connectionsToday || 0);
+        if (availRes.ok) {
+          const availData = await availRes.json();
+          setAvailableCount(availData.count || 0);
+        }
+        if (rlRes.ok) {
+          const rlData = await rlRes.json();
+          setRateLimitedCount(rlData.hourCount || 0);
+          setConnectionsToday(rlData.connectionsToday || 0);
+        }
       } catch {
         // Keep checking state on error
       }

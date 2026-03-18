@@ -177,8 +177,8 @@ async function checkGeminiStatus(): Promise<AIServiceStatus> {
   } catch {
     return {
       service: "gemini",
-      status: "operational",
-      statusText: "Operational",
+      status: "checking",
+      statusText: "Unable to check",
       lastChecked: new Date().toISOString(),
     };
   }

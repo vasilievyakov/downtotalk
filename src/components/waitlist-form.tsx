@@ -6,18 +6,35 @@ export function WaitlistForm() {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
 
     setLoading(true);
+    setError(null);
 
-    // TODO: Replace with real API endpoint (Supabase)
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    try {
+      const res = await fetch("/api/waitlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
 
-    setSubmitted(true);
-    setLoading(false);
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Something went wrong. Try again.");
+        return;
+      }
+
+      setSubmitted(true);
+    } catch {
+      setError("Can't reach the server. Try again later.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (submitted) {
@@ -41,7 +58,10 @@ export function WaitlistForm() {
       <input
         type="email"
         value={email}
-        onChange={(e) => setEmail(e.target.value)}
+        onChange={(e) => {
+          setEmail(e.target.value);
+          if (error) setError(null);
+        }}
         placeholder="your@email.com"
         required
         className="flex-1 px-4 py-3 rounded-lg bg-card border border-card-border text-foreground placeholder:text-muted focus:outline-none focus:border-green transition-colors font-mono text-sm"
@@ -53,6 +73,11 @@ export function WaitlistForm() {
       >
         {loading ? "Joining..." : "Join Waitlist"}
       </button>
+      {error && (
+        <p className="text-red text-sm sm:col-span-2 text-center w-full">
+          {error}
+        </p>
+      )}
     </form>
   );
 }

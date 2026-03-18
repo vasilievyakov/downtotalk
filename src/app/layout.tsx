@@ -14,6 +14,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_APP_URL || "https://downtotalk.com"
+  ),
   title: "DownToTalk — When AI sleeps, humans connect",
   description:
     "The app that only works when AI doesn't. Get matched with real humans for spontaneous calls when Claude, ChatGPT, or Gemini go down.",
@@ -22,12 +25,14 @@ export const metadata: Metadata = {
     description:
       "The app that only works when AI doesn't. Get matched with real humans for spontaneous calls when AI services go down.",
     type: "website",
+    images: ["/api/og"],
   },
   twitter: {
     card: "summary_large_image",
     title: "DownToTalk — When AI sleeps, humans connect",
     description:
       "The app that only works when AI doesn't.",
+    images: ["/api/og"],
   },
 };
 
