@@ -34,8 +34,18 @@ interface Circle {
   memberCount: number;
 }
 
+interface CircleMember {
+  id: string;
+  name: string | null;
+  image: string | null;
+  city: string | null;
+  isAvailable: boolean;
+}
+
 export function DashboardContent({ user }: { user: User }) {
   const [statuses, setStatuses] = useState<AIServiceStatus[]>([]);
+  const [expandedCircle, setExpandedCircle] = useState<string | null>(null);
+  const [circleMembers, setCircleMembers] = useState<Record<string, CircleMember[]>>({});
   const [isAvailable, setIsAvailable] = useState(false);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [showProfile, setShowProfile] = useState(false);
@@ -128,6 +138,21 @@ export function DashboardContent({ user }: { user: User }) {
     const text = `I just got rate-limited by ${serviceName}. Time to talk to humans instead.`;
     const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(window.location.origin)}`;
     window.open(url, "_blank");
+  };
+
+  const toggleCircle = async (circleId: string) => {
+    if (expandedCircle === circleId) {
+      setExpandedCircle(null);
+      return;
+    }
+    setExpandedCircle(circleId);
+    if (!circleMembers[circleId]) {
+      const res = await fetch(`/api/circles/${circleId}`);
+      const data = await res.json();
+      if (data.members) {
+        setCircleMembers((prev) => ({ ...prev, [circleId]: data.members }));
+      }
+    }
   };
 
   const copyInviteLink = (inviteCode: string) => {
@@ -290,28 +315,60 @@ export function DashboardContent({ user }: { user: User }) {
         ) : (
           <div className="space-y-3">
             {circles.map((circle) => (
-              <div
-                key={circle.id}
-                className="flex items-center justify-between py-3 border-b border-card-border last:border-0"
-              >
-                <div>
-                  <p className="text-sm font-medium">{circle.name}</p>
-                  <p className="text-xs text-muted">
-                    {circle.memberCount}{" "}
-                    {circle.memberCount === 1 ? "member" : "members"}
-                    {circle.isOwner && " · owner"}
-                  </p>
+              <div key={circle.id}>
+                <div className="flex items-center justify-between py-3 border-b border-card-border last:border-0">
+                  <button
+                    onClick={() => toggleCircle(circle.id)}
+                    className="text-left cursor-pointer"
+                  >
+                    <p className="text-sm font-medium">{circle.name}</p>
+                    <p className="text-xs text-muted">
+                      {circle.memberCount}{" "}
+                      {circle.memberCount === 1 ? "member" : "members"}
+                      {circle.isOwner && " · owner"}
+                      <span className="ml-1">{expandedCircle === circle.id ? "▾" : "▸"}</span>
+                    </p>
+                  </button>
+
+                  {circle.isOwner && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); copyInviteLink(circle.inviteCode); }}
+                      className="text-xs px-3 py-1.5 rounded-lg border border-card-border hover:border-green hover:text-green transition-colors cursor-pointer"
+                    >
+                      {copied === circle.inviteCode
+                        ? "Copied!"
+                        : "Copy invite link"}
+                    </button>
+                  )}
                 </div>
 
-                {circle.isOwner && (
-                  <button
-                    onClick={() => copyInviteLink(circle.inviteCode)}
-                    className="text-xs px-3 py-1.5 rounded-lg border border-card-border hover:border-green hover:text-green transition-colors cursor-pointer"
-                  >
-                    {copied === circle.inviteCode
-                      ? "Copied!"
-                      : "Copy invite link"}
-                  </button>
+                {expandedCircle === circle.id && (
+                  <div className="py-2 pl-4 space-y-2">
+                    {!circleMembers[circle.id] ? (
+                      <p className="text-xs text-muted">Loading...</p>
+                    ) : circleMembers[circle.id].length === 0 ? (
+                      <p className="text-xs text-muted">No members yet. Share your invite link!</p>
+                    ) : (
+                      circleMembers[circle.id].map((member) => (
+                        <div key={member.id} className="flex items-center gap-3 py-1">
+                          {member.image ? (
+                            <img src={member.image} alt="" className="w-6 h-6 rounded-full" />
+                          ) : (
+                            <div className="w-6 h-6 rounded-full bg-card-border flex items-center justify-center text-xs text-muted">
+                              {member.name?.[0] || "?"}
+                            </div>
+                          )}
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm">{member.name || "Anonymous"}</span>
+                            {member.city && <span className="text-xs text-muted">{member.city}</span>}
+                            {member.isAvailable && (
+                              <span className="w-2 h-2 rounded-full bg-green" title="Available" />
+                            )}
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
                 )}
               </div>
             ))}
