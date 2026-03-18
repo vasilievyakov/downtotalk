@@ -238,7 +238,7 @@ export function DashboardContent({ user }: { user: User }) {
             Get notified when someone&apos;s free to talk.
           </p>
           <a
-            href={`https://t.me/DownToTalkBot?start=${profile.id}`}
+            href={`https://t.me/Downtotalk_bot?start=${profile.id}`}
             target="_blank"
             rel="noopener noreferrer"
             className="text-xs px-3 py-1.5 rounded-lg bg-[#2AABEE] text-white hover:opacity-90 transition-opacity whitespace-nowrap"

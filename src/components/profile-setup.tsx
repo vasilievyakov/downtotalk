@@ -133,7 +133,7 @@ export function ProfileSetup({
             </p>
             {profile?.id && (
               <a
-                href={`https://t.me/DownToTalkBot?start=${profile.id}`}
+                href={`https://t.me/Downtotalk_bot?start=${profile.id}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-block px-4 py-2 rounded-lg bg-[#2AABEE] text-white text-sm font-medium hover:opacity-90 transition-opacity"

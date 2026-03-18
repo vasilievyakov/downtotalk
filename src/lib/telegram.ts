@@ -128,7 +128,7 @@ export async function notifyServiceSubscribers(
         : "Gemini";
 
   const statusEmoji = status === "outage" ? "\u{1F534}" : "\u{1F7E1}";
-  const message = `${statusEmoji} <b>${serviceName}</b> is ${status}.\n\nCheck who's free: downtotalk.com/dashboard`;
+  const message = `${statusEmoji} <b>${serviceName}</b> is ${status}.\n\nCheck who's free: downtotalk.vercel.app/dashboard`;
 
   for (const s of subscribers) {
     if (!s.telegramChatId) continue;

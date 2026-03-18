@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
   const countParam = searchParams.get("count");
 
   let headline = "When AI sleeps, humans connect";
-  let subtitle = "downtotalk.com";
+  let subtitle = "downtotalk.vercel.app";
 
   const VALID_SERVICES: Record<string, string> = {
     claude: "Claude",

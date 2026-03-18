@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     });
     notifyCircleMembers(
       session.user.id,
-      `${currentUser?.name || "Someone"} is now available to talk.\n\nJoin: downtotalk.com/dashboard`
+      `${currentUser?.name || "Someone"} is now available to talk.\n\nJoin: downtotalk.vercel.app/dashboard`
     ).catch(() => {}); // fire-and-forget
   }
 

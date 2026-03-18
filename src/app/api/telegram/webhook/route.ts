@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     if (!userId) {
       await sendTelegramMessage(
         chatId,
-        "Welcome to DownToTalk!\n\nTo enable notifications, use the link from your profile at downtotalk.com."
+        "Welcome to DownToTalk!\n\nTo enable notifications, use the link from your profile at downtotalk.vercel.app."
       );
       return NextResponse.json({ ok: true });
     }

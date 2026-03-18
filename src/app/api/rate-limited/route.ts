@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
     service === "claude" ? "Claude" : service === "openai" ? "ChatGPT" : "Gemini";
   notifyCircleMembers(
     session.user.id,
-    `${currentUser?.name || "Someone"} is free \u2014 hit the ${serviceName} limit.\n\nJoin: downtotalk.com/dashboard`
+    `${currentUser?.name || "Someone"} is free \u2014 hit the ${serviceName} limit.\n\nJoin: downtotalk.vercel.app/dashboard`
   ).catch(() => {}); // fire-and-forget
 
   // Count others who are available (within shared circles only)
