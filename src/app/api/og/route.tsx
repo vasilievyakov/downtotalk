@@ -12,18 +12,21 @@ export async function GET(request: NextRequest) {
   let headline = "When AI sleeps, humans connect";
   let subtitle = "downtotalk.com";
 
-  if (event === "rate-limited" && service) {
-    const serviceName =
-      service === "claude"
-        ? "Claude"
-        : service === "openai"
-          ? "ChatGPT"
-          : "Gemini";
-    headline = `I just got rate-limited by ${serviceName}.`;
+  const VALID_SERVICES: Record<string, string> = {
+    claude: "Claude",
+    openai: "ChatGPT",
+    gemini: "Gemini",
+  };
+
+  if (event === "rate-limited" && service && VALID_SERVICES[service]) {
+    headline = `I just got rate-limited by ${VALID_SERVICES[service]}.`;
     subtitle = "Talked to a human instead.";
   } else if (event === "connected" && countParam) {
-    headline = `Had ${countParam} human conversations`;
-    subtitle = "during AI downtime.";
+    const count = parseInt(countParam, 10);
+    if (!isNaN(count) && count > 0 && count < 100000) {
+      headline = `Had ${count} human conversations`;
+      subtitle = "during AI downtime.";
+    }
   }
 
   return new ImageResponse(

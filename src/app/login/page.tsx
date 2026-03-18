@@ -9,7 +9,10 @@ export default async function LoginPage({
 }) {
   const session = await auth();
   const { returnTo } = await searchParams;
-  const redirectTo = returnTo || "/dashboard";
+  const redirectTo =
+    returnTo && returnTo.startsWith("/") && !returnTo.startsWith("//")
+      ? returnTo
+      : "/dashboard";
 
   if (session) redirect(redirectTo);
 

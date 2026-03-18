@@ -2,16 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { circles, circleMemberships, users } from "@/db/schema";
-import { eq, sql } from "drizzle-orm";
+import { eq, sql, count } from "drizzle-orm";
+import { generateInviteCode } from "@/lib/crypto";
 
-function generateInviteCode(): string {
-  const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-  let code = "";
-  for (let i = 0; i < 8; i++) {
-    code += chars[Math.floor(Math.random() * chars.length)];
-  }
-  return code;
-}
+const MAX_CIRCLES_PER_USER = 20;
 
 export async function GET() {
   const session = await auth();
@@ -66,11 +60,12 @@ export async function GET() {
         .from(circleMemberships)
         .where(eq(circleMemberships.circleId, m.circle.id));
 
+      const isOwner = m.circle.ownerId === session.user!.id;
       return {
         id: m.circle.id,
         name: m.circle.name,
-        inviteCode: m.circle.inviteCode,
-        isOwner: m.circle.ownerId === session.user!.id,
+        inviteCode: isOwner ? m.circle.inviteCode : undefined,
+        isOwner,
         memberCount: Number(memberCount[0].count),
         createdAt: m.circle.createdAt,
       };
@@ -86,9 +81,23 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { name } = await request.json();
-  if (!name) {
-    return NextResponse.json({ error: "Name required" }, { status: 400 });
+  let body;
+  try { body = await request.json(); } catch {
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+  }
+  const { name: rawName } = body;
+  if (!rawName || typeof rawName !== "string" || rawName.trim().length === 0 || rawName.length > 100) {
+    return NextResponse.json({ error: "Name required (max 100 chars)" }, { status: 400 });
+  }
+  const name = rawName.trim();
+
+  // Limit circles per user
+  const [circleCount] = await db
+    .select({ count: count() })
+    .from(circles)
+    .where(eq(circles.ownerId, session.user.id));
+  if (circleCount.count >= MAX_CIRCLES_PER_USER) {
+    return NextResponse.json({ error: "Circle limit reached" }, { status: 400 });
   }
 
   const [circle] = await db

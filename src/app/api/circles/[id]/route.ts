@@ -15,6 +15,10 @@ export async function GET(
 
   const { id } = await params;
 
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+
   const circle = await db.query.circles.findFirst({
     where: eq(circles.id, id),
   });
@@ -50,10 +54,14 @@ export async function GET(
     },
   });
 
+  const isOwner = circle.ownerId === session.user.id;
   return NextResponse.json({
     circle: {
-      ...circle,
-      isOwner: circle.ownerId === session.user.id,
+      id: circle.id,
+      name: circle.name,
+      inviteCode: isOwner ? circle.inviteCode : undefined,
+      isOwner,
+      createdAt: circle.createdAt,
     },
     members: memberships.map((m) => ({
       ...m.user,

@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { circles, circleMemberships, users } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, count } from "drizzle-orm";
+
+const MAX_MEMBERS_PER_CIRCLE = 100;
 
 export async function GET(
   _request: NextRequest,
@@ -52,6 +54,15 @@ export async function POST(
 
   if (!circle) {
     return NextResponse.json({ error: "Invalid invite" }, { status: 404 });
+  }
+
+  // Check member limit
+  const [memberCount] = await db
+    .select({ count: count() })
+    .from(circleMemberships)
+    .where(eq(circleMemberships.circleId, circle.id));
+  if (memberCount.count >= MAX_MEMBERS_PER_CIRCLE) {
+    return NextResponse.json({ error: "Circle is full" }, { status: 400 });
   }
 
   // Add to circle (onConflictDoNothing handles duplicates)

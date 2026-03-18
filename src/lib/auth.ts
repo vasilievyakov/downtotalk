@@ -3,18 +3,11 @@ import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
 import { db } from "@/db";
 import { users, circles, circleMemberships } from "@/db/schema";
-import { eq } from "drizzle-orm";
-
-function generateInviteCode(): string {
-  const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-  let code = "";
-  for (let i = 0; i < 8; i++) {
-    code += chars[Math.floor(Math.random() * chars.length)];
-  }
-  return code;
-}
+import { eq, inArray } from "drizzle-orm";
+import { generateInviteCode } from "@/lib/crypto";
 
 async function ensureDefaultCircle(userId: string, userName?: string | null): Promise<string> {
+  // Check first (fast path)
   const existing = await db.query.circles.findFirst({
     where: eq(circles.ownerId, userId),
   });
@@ -22,22 +15,30 @@ async function ensureDefaultCircle(userId: string, userName?: string | null): Pr
 
   const circleName = userName ? `${userName}'s circle` : "My circle";
 
-  const [circle] = await db
-    .insert(circles)
-    .values({
-      ownerId: userId,
-      name: circleName,
-      inviteCode: generateInviteCode(),
-    })
-    .returning();
+  try {
+    const [circle] = await db
+      .insert(circles)
+      .values({
+        ownerId: userId,
+        name: circleName,
+        inviteCode: generateInviteCode(),
+      })
+      .returning();
 
-  // Owner is also a member of their own circle
-  await db.insert(circleMemberships).values({
-    circleId: circle.id,
-    userId,
-  });
+    // Owner is also a member of their own circle
+    await db
+      .insert(circleMemberships)
+      .values({ circleId: circle.id, userId })
+      .onConflictDoNothing();
 
-  return circle.id;
+    return circle.id;
+  } catch {
+    // Race condition: another request created the circle — fetch it
+    const created = await db.query.circles.findFirst({
+      where: eq(circles.ownerId, userId),
+    });
+    return created!.id;
+  }
 }
 
 async function importGitHubSocialGraph(
@@ -69,14 +70,11 @@ async function importGitHubSocialGraph(
 
     if (ghUsernames.size === 0) return;
 
-    // Find matching DownToTalk users
-    const allUsers = await db.query.users.findMany({
+    // Find matching DownToTalk users (targeted query, not full table scan)
+    const matchedUsers = await db.query.users.findMany({
+      where: inArray(users.githubUsername, [...ghUsernames]),
       columns: { id: true, githubUsername: true },
     });
-
-    const matchedUsers = allUsers.filter(
-      (u) => u.githubUsername && ghUsernames.has(u.githubUsername.toLowerCase())
-    );
 
     if (matchedUsers.length === 0) return;
 
@@ -99,7 +97,7 @@ async function importGitHubSocialGraph(
         .onConflictDoNothing();
     }
   } catch (error) {
-    console.error("Failed to import GitHub social graph:", error);
+    console.error("Failed to import GitHub social graph:", error instanceof Error ? error.message : "unknown error");
   }
 }
 
@@ -148,47 +146,42 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             name: user.name || profile?.name || null,
             image: user.image || null,
             githubUsername,
-            githubAccessToken:
-              account?.provider === "github"
-                ? (account.access_token ?? null)
-                : null,
+            // Don't store GitHub token — use it only during sign-in
           })
           .returning();
 
         // Create default circle for new user
         await ensureDefaultCircle(newUser.id, newUser.name);
 
-        // Import GitHub social graph for new users
+        // Import GitHub social graph for new users (use token in-flight, don't persist)
         if (
           account?.provider === "github" &&
           account.access_token &&
           githubUsername
         ) {
-          // Fire and forget — don't block sign-in
           importGitHubSocialGraph(
             newUser.id,
             githubUsername,
             account.access_token
-          );
+          ).catch(() => {});
         }
       } else {
-        // Update GitHub token on existing user if signing in via GitHub
-        if (account?.provider === "github" && account.access_token) {
-          await db
-            .update(users)
-            .set({
-              githubAccessToken: account.access_token,
-              ...(githubUsername ? { githubUsername } : {}),
-            })
-            .where(eq(users.id, existing.id));
-
-          // Re-import social graph on each GitHub login
+        // Update GitHub username on existing user if signing in via GitHub
+        if (account?.provider === "github") {
           if (githubUsername) {
+            await db
+              .update(users)
+              .set({ githubUsername })
+              .where(eq(users.id, existing.id));
+          }
+
+          // Re-import social graph on each GitHub login (use token in-flight)
+          if (account.access_token && githubUsername) {
             importGitHubSocialGraph(
               existing.id,
               githubUsername,
               account.access_token
-            );
+            ).catch(() => {});
           }
         }
 
