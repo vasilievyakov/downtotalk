@@ -106,7 +106,12 @@ export function DashboardContent({ user }: { user: User }) {
     fetchProfile();
     fetchCircles();
     const interval = setInterval(fetchStatuses, 60000);
-    return () => clearInterval(interval);
+    const onFocus = () => fetchProfile();
+    window.addEventListener("focus", onFocus);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("focus", onFocus);
+    };
   }, [fetchStatuses, fetchProfile, fetchCircles]);
 
   const toggleAvailability = async () => {
@@ -231,20 +236,29 @@ export function DashboardContent({ user }: { user: User }) {
       )}
 
       {/* Telegram notification banner */}
-      {profile && !profile.telegramChatId && !showProfile && (
-        <div className="rounded-xl border border-[#2AABEE]/30 bg-[#2AABEE]/5 p-4 mb-6 flex items-center justify-between">
-          <p className="text-sm">
-            Get notified when someone&apos;s free to talk.
-          </p>
-          <a
-            href={`https://t.me/Downtotalk_bot?start=${profile.id}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs px-3 py-1.5 rounded-lg bg-[#2AABEE] text-white hover:opacity-90 transition-opacity whitespace-nowrap"
-          >
-            Enable Telegram
-          </a>
-        </div>
+      {profile && !showProfile && (
+        profile.telegramChatId ? (
+          <div className="rounded-xl border border-green/30 bg-green/5 p-4 mb-6 flex items-center gap-3">
+            <span className="text-green">&#10003;</span>
+            <p className="text-sm text-green">
+              Telegram notifications enabled — you&apos;ll hear when someone&apos;s free.
+            </p>
+          </div>
+        ) : (
+          <div className="rounded-xl border border-[#2AABEE]/30 bg-[#2AABEE]/5 p-4 mb-6 flex items-center justify-between">
+            <p className="text-sm">
+              Get notified when someone&apos;s free to talk.
+            </p>
+            <a
+              href={`https://t.me/Downtotalk_bot?start=${profile.id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs px-3 py-1.5 rounded-lg bg-[#2AABEE] text-white hover:opacity-90 transition-opacity whitespace-nowrap"
+            >
+              Enable Telegram
+            </a>
+          </div>
+        )
       )}
 
       {/* Profile Setup (expandable) */}
