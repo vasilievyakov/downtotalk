@@ -70,10 +70,10 @@ graph LR
     B --> C[(Neon DB)]
     B -->|Fire & forget| D[Telegram Bot]
     D -->|Inline keyboard| E[Circle members]
-    E -->|One tap| F[Call / Chat]
+    E -->|One tap| F[Call or Chat]
 
-    G[UptimeRobot] -->|5 min| H[/api/status]
-    H -->|RSS / JSON| I[Claude · ChatGPT · Gemini]
+    G[UptimeRobot] -->|5 min| H[Status endpoint]
+    H -->|RSS and JSON| I[Claude, ChatGPT, Gemini]
     H -->|Status changed?| D
 ```
 
