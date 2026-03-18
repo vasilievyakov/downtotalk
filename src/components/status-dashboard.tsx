@@ -42,18 +42,24 @@ export function StatusDashboard() {
     { service: "gemini", status: "checking", statusText: "Checking..." },
   ]);
   const [availableCount, setAvailableCount] = useState(0);
+  const [rateLimitedCount, setRateLimitedCount] = useState(0);
+  const [connectionsToday, setConnectionsToday] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [statusRes, availRes] = await Promise.all([
+        const [statusRes, availRes, rlRes] = await Promise.all([
           fetch("/api/status"),
           fetch("/api/availability"),
+          fetch("/api/rate-limited"),
         ]);
         const statusData = await statusRes.json();
         const availData = await availRes.json();
+        const rlData = await rlRes.json();
         setServices(statusData.statuses);
         setAvailableCount(availData.count || 0);
+        setRateLimitedCount(rlData.hourCount || 0);
+        setConnectionsToday(rlData.connectionsToday || 0);
       } catch {
         // Keep checking state on error
       }
@@ -116,22 +122,25 @@ export function StatusDashboard() {
         ))}
       </div>
 
-      {/* People counter */}
-      <div className="mt-6 pt-6 border-t border-card-border text-center">
-        {anyDown ? (
-          <p className="text-lg">
-            <span className="text-green font-bold text-2xl">
-              {availableCount}
-            </span>{" "}
-            <span className="text-muted">people are free right now</span>
-          </p>
-        ) : (
-          <p className="text-muted">
-            <span className="font-bold text-foreground">{availableCount}</span>{" "}
-            people ready for the next outage.{" "}
-            <span className="text-green">Be one of them.</span>
-          </p>
-        )}
+      {/* Live stats */}
+      <div className="mt-6 pt-6 border-t border-card-border space-y-2">
+        <p className="text-sm">
+          <span className="mr-2">&#x1f7e2;</span>
+          <span className="font-bold text-green">{availableCount}</span>{" "}
+          <span className="text-muted">people available right now</span>
+        </p>
+        <p className="text-sm">
+          <span className="mr-2">&#x1f525;</span>
+          <span className="font-bold" style={{ color: "#E86235" }}>
+            {rateLimitedCount}
+          </span>{" "}
+          <span className="text-muted">hit their AI limit this hour</span>
+        </p>
+        <p className="text-sm">
+          <span className="mr-2">&#x1f4ac;</span>
+          <span className="font-bold text-foreground">{connectionsToday}</span>{" "}
+          <span className="text-muted">conversations today</span>
+        </p>
       </div>
     </div>
   );

@@ -41,6 +41,11 @@ export function DashboardContent({ user }: { user: User }) {
   const [showProfile, setShowProfile] = useState(false);
   const [circles, setCircles] = useState<Circle[]>([]);
   const [copied, setCopied] = useState<string | null>(null);
+  const [rateLimitConfirm, setRateLimitConfirm] = useState<{
+    service: string;
+    othersAvailable: number;
+  } | null>(null);
+  const [rateLimitLoading, setRateLimitLoading] = useState<string | null>(null);
 
   const fetchStatuses = useCallback(async () => {
     const res = await fetch("/api/status");
@@ -88,6 +93,41 @@ export function DashboardContent({ user }: { user: User }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ isAvailable: newState }),
     });
+  };
+
+  const reportRateLimit = async (service: string) => {
+    setRateLimitLoading(service);
+    try {
+      const res = await fetch("/api/rate-limited", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ service }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        setIsAvailable(true);
+        setRateLimitConfirm({
+          service,
+          othersAvailable: data.othersAvailable,
+        });
+        setTimeout(() => setRateLimitConfirm(null), 5000);
+      }
+    } finally {
+      setRateLimitLoading(null);
+    }
+  };
+
+  const shareOnX = (service: string) => {
+    const serviceName =
+      service === "claude"
+        ? "Claude"
+        : service === "openai"
+          ? "ChatGPT"
+          : "Gemini";
+    const ogUrl = `${window.location.origin}/api/og?event=rate-limited&service=${service}`;
+    const text = `I just got rate-limited by ${serviceName}. Time to talk to humans instead.`;
+    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(window.location.origin)}`;
+    window.open(url, "_blank");
   };
 
   const copyInviteLink = (inviteCode: string) => {
@@ -178,6 +218,53 @@ export function DashboardContent({ user }: { user: User }) {
             </div>
           ))}
         </div>
+      </div>
+
+      {/* I hit my limit */}
+      <div className="rounded-xl border border-card-border bg-card p-6 mb-6">
+        <h2 className="text-sm font-mono text-muted uppercase tracking-wider mb-4">
+          I hit my limit
+        </h2>
+        <div className="grid grid-cols-3 gap-3">
+          <button
+            onClick={() => reportRateLimit("claude")}
+            disabled={rateLimitLoading !== null}
+            className="px-4 py-3 rounded-lg border border-card-border text-sm font-medium transition-colors cursor-pointer hover:border-[#D97706] hover:text-[#D97706] disabled:opacity-50"
+            style={{ borderColor: rateLimitLoading === "claude" ? "#D97706" : undefined }}
+          >
+            {rateLimitLoading === "claude" ? "..." : "Claude limit hit"}
+          </button>
+          <button
+            onClick={() => reportRateLimit("openai")}
+            disabled={rateLimitLoading !== null}
+            className="px-4 py-3 rounded-lg border border-card-border text-sm font-medium transition-colors cursor-pointer hover:border-[#10A37F] hover:text-[#10A37F] disabled:opacity-50"
+          >
+            {rateLimitLoading === "openai" ? "..." : "ChatGPT limit hit"}
+          </button>
+          <button
+            onClick={() => reportRateLimit("gemini")}
+            disabled={rateLimitLoading !== null}
+            className="px-4 py-3 rounded-lg border border-card-border text-sm font-medium transition-colors cursor-pointer hover:border-[#4285F4] hover:text-[#4285F4] disabled:opacity-50"
+          >
+            {rateLimitLoading === "gemini" ? "..." : "Gemini limit hit"}
+          </button>
+        </div>
+        {rateLimitConfirm && (
+          <div className="mt-4 p-3 rounded-lg bg-green/10 border border-green/20">
+            <p className="text-sm text-green">
+              You&apos;re now visible.{" "}
+              {rateLimitConfirm.othersAvailable > 0
+                ? `${rateLimitConfirm.othersAvailable} ${rateLimitConfirm.othersAvailable === 1 ? "other is" : "others are"} free too.`
+                : "Be the first one online!"}
+            </p>
+            <button
+              onClick={() => shareOnX(rateLimitConfirm.service)}
+              className="mt-2 text-xs px-3 py-1.5 rounded-lg border border-card-border hover:border-foreground transition-colors cursor-pointer"
+            >
+              Share on X
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Availability Toggle */}

@@ -124,6 +124,19 @@ export const notifications = pgTable("notifications", {
 });
 
 // ──────────────────────────────────────────
+// Rate limit events (user-reported)
+// ──────────────────────────────────────────
+
+export const rateLimitEvents = pgTable("rate_limit_events", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  service: text("service").notNull(), // "claude" | "openai" | "gemini"
+  createdAt: timestamp("created_at", { mode: "date" }).defaultNow(),
+});
+
+// ──────────────────────────────────────────
 // Circles (invite-based social graph)
 // ──────────────────────────────────────────
 

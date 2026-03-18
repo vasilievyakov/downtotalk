@@ -5,6 +5,7 @@ import {
   circleMemberships,
   connections,
   notifications,
+  rateLimitEvents,
 } from "./schema";
 
 export const usersRelations = relations(users, ({ many }) => ({
@@ -13,6 +14,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   initiatedConnections: many(connections, { relationName: "initiator" }),
   receivedConnections: many(connections, { relationName: "receiver" }),
   notifications: many(notifications),
+  rateLimitEvents: many(rateLimitEvents),
 }));
 
 export const circlesRelations = relations(circles, ({ one, many }) => ({
@@ -56,3 +58,13 @@ export const notificationsRelations = relations(notifications, ({ one }) => ({
     references: [users.id],
   }),
 }));
+
+export const rateLimitEventsRelations = relations(
+  rateLimitEvents,
+  ({ one }) => ({
+    user: one(users, {
+      fields: [rateLimitEvents.userId],
+      references: [users.id],
+    }),
+  })
+);

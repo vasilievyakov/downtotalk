@@ -18,10 +18,9 @@ export function Manifesto() {
         </p>
         <div className="pt-4 border-t border-card-border mt-8">
           <p className="text-muted text-sm leading-relaxed">
-            Claude uptime is 99.64%. That&apos;s still 3+ hours of human
-            connection per quarter. ChatGPT and Gemini add more. Every outage is
-            an opportunity to remember what screens were originally for —
-            connecting people.
+            Claude uptime is 99.64%. But rate limits hit thousands daily. Every
+            limit is an opportunity to remember what screens were originally for
+            — connecting people.
           </p>
         </div>
       </div>
