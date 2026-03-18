@@ -20,12 +20,34 @@ export async function GET() {
   }
 
   // Get circles where user is a member, with circle details
-  const memberships = await db.query.circleMemberships.findMany({
+  let memberships = await db.query.circleMemberships.findMany({
     where: eq(circleMemberships.userId, session.user.id),
     with: {
       circle: true,
     },
   });
+
+  // Auto-create default circle if user has none
+  if (memberships.length === 0) {
+    const [circle] = await db
+      .insert(circles)
+      .values({
+        ownerId: session.user.id,
+        name: "My network",
+        inviteCode: generateInviteCode(),
+      })
+      .returning();
+
+    await db.insert(circleMemberships).values({
+      circleId: circle.id,
+      userId: session.user.id,
+    });
+
+    memberships = await db.query.circleMemberships.findMany({
+      where: eq(circleMemberships.userId, session.user.id),
+      with: { circle: true },
+    });
+  }
 
   // Count members per circle
   const circlesWithCounts = await Promise.all(
