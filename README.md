@@ -74,6 +74,30 @@ graph LR
 | Monitoring | RSS/JSON parsing + UptimeRobot |
 | Hosting | Vercel |
 
+## Public API
+
+DownToTalk exposes a free, unauthenticated API endpoint:
+
+```
+GET https://downtotalk.vercel.app/api/status
+```
+
+Returns real-time AI service status and availability data:
+
+```json
+{
+  "statuses": [
+    {"service": "claude", "status": "operational", "...": ""},
+    {"service": "openai", "status": "operational", "...": ""},
+    {"service": "gemini", "status": "operational", "...": ""}
+  ],
+  "availableCount": 3,
+  "timestamp": "2026-03-18T20:00:00.000Z"
+}
+```
+
+Use it in your tools, dashboards, or bots. No API key needed.
+
 ## Quick Start
 
 ```bash

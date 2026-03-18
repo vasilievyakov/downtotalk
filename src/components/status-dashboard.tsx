@@ -42,6 +42,7 @@ export function StatusDashboard() {
     { service: "gemini", status: "checking", statusText: "Checking..." },
   ]);
   const [waitlistCount, setWaitlistCount] = useState<number | null>(null);
+  const [availableCount, setAvailableCount] = useState<number>(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -49,6 +50,7 @@ export function StatusDashboard() {
         const statusRes = await fetch("/api/status");
         const statusData = await statusRes.json();
         setServices(statusData.statuses);
+        setAvailableCount(statusData.availableCount ?? 0);
 
         const wlRes = await fetch("/api/waitlist");
         if (wlRes.ok) {
@@ -116,6 +118,19 @@ export function StatusDashboard() {
           </div>
         ))}
       </div>
+
+      {/* Available count */}
+      {availableCount > 0 && (
+        <div className="mt-6 pt-6 border-t border-card-border">
+          <p className="text-sm">
+            <span className={`inline-block w-2 h-2 rounded-full bg-green pulse-dot mr-2`} />
+            <span className="font-bold text-green">{availableCount}</span>{" "}
+            <span className="text-muted">
+              {availableCount === 1 ? "person" : "people"} free right now
+            </span>
+          </p>
+        </div>
+      )}
 
       {/* Waitlist count */}
       {waitlistCount !== null && waitlistCount > 0 && (

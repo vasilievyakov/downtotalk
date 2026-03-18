@@ -48,5 +48,12 @@ export async function GET() {
     }
   }
 
-  return NextResponse.json({ statuses, timestamp: new Date().toISOString() });
+  const availableResult = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(users)
+    .where(eq(users.isAvailable, true));
+
+  const availableCount = Number(availableResult[0]?.count ?? 0);
+
+  return NextResponse.json({ statuses, availableCount, timestamp: new Date().toISOString() });
 }
