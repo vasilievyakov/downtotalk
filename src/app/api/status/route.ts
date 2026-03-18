@@ -1,13 +1,24 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
-import { serviceStatuses } from "@/db/schema";
-import { eq, desc } from "drizzle-orm";
+import { serviceStatuses, users } from "@/db/schema";
+import { eq, desc, and, lt, sql } from "drizzle-orm";
 import { checkAllStatuses } from "@/lib/status-monitor";
 import { notifyServiceSubscribers } from "@/lib/telegram";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
+  // Auto-reset availability after 2 hours
+  await db
+    .update(users)
+    .set({ isAvailable: false, availableSince: null })
+    .where(
+      and(
+        eq(users.isAvailable, true),
+        lt(users.availableSince, sql`NOW() - INTERVAL '2 hours'`)
+      )
+    );
+
   const statuses = await checkAllStatuses();
 
   // Compare with previous status and notify on transitions

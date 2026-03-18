@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { waitlist } from "@/db/schema";
+import { count } from "drizzle-orm";
+
+export async function GET() {
+  const result = await db.select({ count: count() }).from(waitlist);
+  return NextResponse.json({ count: result[0].count });
+}
 
 export async function POST(request: NextRequest) {
   try {

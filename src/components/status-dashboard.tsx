@@ -41,9 +41,7 @@ export function StatusDashboard() {
     { service: "openai", status: "checking", statusText: "Checking..." },
     { service: "gemini", status: "checking", statusText: "Checking..." },
   ]);
-  const [availableCount, setAvailableCount] = useState(0);
-  const [rateLimitedCount, setRateLimitedCount] = useState(0);
-  const [connectionsToday, setConnectionsToday] = useState(0);
+  const [waitlistCount, setWaitlistCount] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -52,19 +50,10 @@ export function StatusDashboard() {
         const statusData = await statusRes.json();
         setServices(statusData.statuses);
 
-        // These require auth — graceful fallback for landing page
-        const [availRes, rlRes] = await Promise.all([
-          fetch("/api/availability"),
-          fetch("/api/rate-limited"),
-        ]);
-        if (availRes.ok) {
-          const availData = await availRes.json();
-          setAvailableCount(availData.count || 0);
-        }
-        if (rlRes.ok) {
-          const rlData = await rlRes.json();
-          setRateLimitedCount(rlData.hourCount || 0);
-          setConnectionsToday(rlData.connectionsToday || 0);
+        const wlRes = await fetch("/api/waitlist");
+        if (wlRes.ok) {
+          const wlData = await wlRes.json();
+          setWaitlistCount(wlData.count || 0);
         }
       } catch {
         // Keep checking state on error
@@ -128,26 +117,16 @@ export function StatusDashboard() {
         ))}
       </div>
 
-      {/* Live stats */}
-      <div className="mt-6 pt-6 border-t border-card-border space-y-2">
-        <p className="text-sm">
-          <span className="mr-2">&#x1f7e2;</span>
-          <span className="font-bold text-green">{availableCount}</span>{" "}
-          <span className="text-muted">people available right now</span>
-        </p>
-        <p className="text-sm">
-          <span className="mr-2">&#x1f525;</span>
-          <span className="font-bold" style={{ color: "#E86235" }}>
-            {rateLimitedCount}
-          </span>{" "}
-          <span className="text-muted">hit their AI limit this hour</span>
-        </p>
-        <p className="text-sm">
-          <span className="mr-2">&#x1f4ac;</span>
-          <span className="font-bold text-foreground">{connectionsToday}</span>{" "}
-          <span className="text-muted">conversations today</span>
-        </p>
-      </div>
+      {/* Waitlist count */}
+      {waitlistCount !== null && waitlistCount > 0 && (
+        <div className="mt-6 pt-6 border-t border-card-border">
+          <p className="text-sm">
+            <span className="mr-2">&#x1f525;</span>
+            <span className="font-bold text-green">{waitlistCount}</span>{" "}
+            <span className="text-muted">people waiting for the next outage</span>
+          </p>
+        </div>
+      )}
     </div>
   );
 }
