@@ -31,7 +31,7 @@ When Claude, ChatGPT, or Gemini goes down — or you hit your rate limit — Dow
 
 <br>
 
-## The moment
+## The quiet moment
 
 You're deep in a conversation with Claude. Debugging a gnarly issue. Building something important. Then:
 
@@ -39,47 +39,66 @@ You're deep in a conversation with Claude. Debugging a gnarly issue. Building so
 Rate limit exceeded. Please try again later.
 ```
 
-You stare at the screen. You refresh. You check the status page. You open Twitter to see if others are affected. You wait.
+It's just you. Nobody else knows. You stare at the screen, refresh, wait. Your friend — three time zones away — hit the same wall ten minutes ago. She's doing the same thing right now: staring, refreshing, waiting. Alone.
 
-Meanwhile, your friend — three time zones away — just hit the same wall. She's doing the same thing: staring, refreshing, waiting.
+**With DownToTalk:** you tap "Claude" on the dashboard. One tap. Your circle gets a Telegram message:
 
-**You could have been talking to each other.**
+```
+┌──────────────────────────────────────┐
+│  Alex is free — hit the Claude       │
+│  limit.                              │
+│                                      │
+│  Reach out while they're waiting!    │
+│                                      │
+│  [Message on Telegram]               │
+│  [Call on WhatsApp]                  │
+│  [Open dashboard]                    │
+└──────────────────────────────────────┘
+```
 
-That's DownToTalk. It turns the worst moment of your AI workflow into the best moment of your day.
+One more tap — you're talking. The dead moment becomes a human one.
 
 <br>
 
-## How it actually works
+## The big moment
+
+Then there's the other kind. The one that hits everyone at once.
 
 ```
-┌──────────────┐       ┌──────────────┐       ┌──────────────────────────┐
-│ Claude says  │       │  One tap:    │       │  Your circle gets a      │
-│ "rate limit  │ ────→ │  "I hit my   │ ────→ │  Telegram notification:  │
-│  exceeded"   │       │   limit"     │       │                          │
-└──────────────┘       └──────────────┘       │  [Message on Telegram]   │
-                                              │  [Call on WhatsApp]      │
-                                              │  [Join Zoom]             │
-                                              └──────────────────────────┘
+Claude.ai — Major Outage
+Identified — We are experiencing elevated error rates across all services.
 ```
 
-**Two triggers, one outcome:**
+Thousands of people. Same moment. All stuck. Twitter explodes. Status page refreshes spike. Everyone waits alone — together.
 
-| Trigger | How it fires | What happens |
-|---------|-------------|--------------|
-| **You hit your limit** | One tap on the dashboard | Your circle gets a Telegram notification with buttons to reach you |
-| **Service goes down** | Automatic — we check every 5 min | All subscribers of that service get notified |
+**With DownToTalk:** we detect it automatically. Every 5 minutes, we check the official status pages of Claude, ChatGPT, and Gemini. When a service goes from operational to degraded or outage — your circle gets notified. No button needed. No action required from you.
 
-Either way: your friends know you're free, and they can reach you in one tap.
+Your friend's phone buzzes: *"Claude is down. 12 people free right now."* She taps "Open dashboard," sees who's available, picks up a call. A 4-hour outage becomes a 4-hour conversation.
+
+> The average AI outage lasts **256 minutes**. That's over 4 hours of people staring at error messages — when they could be talking to each other.
 
 <br>
 
-## What your friends see
+## What your friends actually see
 
 <p align="center">
   <img src="docs/telegram-notification.png" width="380" alt="Telegram notification with inline buttons" />
 </p>
 
-<p align="center"><em>Not a link to a dashboard. Not an email. A message with buttons.<br>One tap → you're talking. That's the whole product.</em></p>
+<p align="center"><em>Not a link to a dashboard. Not an email you'll read tomorrow.<br>A message with buttons. One tap → you're talking.</em></p>
+
+<br>
+
+## Two triggers, one outcome
+
+| | You hit your limit | Service goes down |
+|---|---|---|
+| **How it fires** | You tap a button on the dashboard | Automatic — we check every 5 min |
+| **Who gets notified** | Your circle | All subscribers of that service |
+| **What they get** | Telegram message with your contact buttons | Telegram alert + dashboard link |
+| **Your action needed** | One tap | None — it just happens |
+
+Either way: your friends know you're free, and they can reach you in one tap.
 
 <br>
 
@@ -88,11 +107,16 @@ Either way: your friends know you're free, and they can reach you in one tap.
 ```
 Without DownToTalk:                    With DownToTalk:
 
-Claude is down.                        Claude is down.
-You stare at the screen.               Your friends get notified.
-You refresh every 30 seconds.          Someone messages you on Telegram.
-You check Twitter.                     You have coffee over Zoom.
-You feel stuck and alone.              You feel connected.
+You hit a rate limit.                  You hit a rate limit.
+You stare at the screen.               You tap one button.
+You refresh. You wait.                 Your friends get notified.
+                                       Someone messages you.
+
+Claude goes down for everyone.         Claude goes down for everyone.
+You check Twitter.                     Your circle already knows.
+You refresh the status page.           Someone's calling you on Zoom.
+You feel stuck and alone.              You have coffee and a conversation.
+
 The outage ends.                       The outage ends.
 You go back to work.                   You go back to work, but lighter.
 ```
