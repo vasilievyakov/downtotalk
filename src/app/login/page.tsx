@@ -2,9 +2,16 @@ import { signIn } from "@/lib/auth";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
-export default async function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ returnTo?: string }>;
+}) {
   const session = await auth();
-  if (session) redirect("/dashboard");
+  const { returnTo } = await searchParams;
+  const redirectTo = returnTo || "/dashboard";
+
+  if (session) redirect(redirectTo);
 
   return (
     <main className="min-h-screen flex items-center justify-center px-6">
@@ -22,7 +29,7 @@ export default async function LoginPage() {
           <form
             action={async () => {
               "use server";
-              await signIn("google", { redirectTo: "/dashboard" });
+              await signIn("google", { redirectTo });
             }}
           >
             <button
@@ -54,7 +61,7 @@ export default async function LoginPage() {
           <form
             action={async () => {
               "use server";
-              await signIn("github", { redirectTo: "/dashboard" });
+              await signIn("github", { redirectTo });
             }}
           >
             <button

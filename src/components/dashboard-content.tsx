@@ -26,11 +26,21 @@ interface UserProfile {
   isAvailable: boolean;
 }
 
+interface Circle {
+  id: string;
+  name: string;
+  inviteCode: string;
+  isOwner: boolean;
+  memberCount: number;
+}
+
 export function DashboardContent({ user }: { user: User }) {
   const [statuses, setStatuses] = useState<AIServiceStatus[]>([]);
   const [isAvailable, setIsAvailable] = useState(false);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [showProfile, setShowProfile] = useState(false);
+  const [circles, setCircles] = useState<Circle[]>([]);
+  const [copied, setCopied] = useState<string | null>(null);
 
   const fetchStatuses = useCallback(async () => {
     const res = await fetch("/api/status");
@@ -44,7 +54,6 @@ export function DashboardContent({ user }: { user: User }) {
     if (data.user) {
       setProfile(data.user);
       setIsAvailable(data.user.isAvailable || false);
-      // Show profile setup if no contact methods configured
       if (
         !data.user.telegramHandle &&
         !data.user.whatsappNumber &&
@@ -55,12 +64,21 @@ export function DashboardContent({ user }: { user: User }) {
     }
   }, []);
 
+  const fetchCircles = useCallback(async () => {
+    const res = await fetch("/api/circles");
+    const data = await res.json();
+    if (data.circles) {
+      setCircles(data.circles);
+    }
+  }, []);
+
   useEffect(() => {
     fetchStatuses();
     fetchProfile();
+    fetchCircles();
     const interval = setInterval(fetchStatuses, 60000);
     return () => clearInterval(interval);
-  }, [fetchStatuses, fetchProfile]);
+  }, [fetchStatuses, fetchProfile, fetchCircles]);
 
   const toggleAvailability = async () => {
     const newState = !isAvailable;
@@ -70,6 +88,13 @@ export function DashboardContent({ user }: { user: User }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ isAvailable: newState }),
     });
+  };
+
+  const copyInviteLink = (inviteCode: string) => {
+    const url = `${window.location.origin}/invite/${inviteCode}`;
+    navigator.clipboard.writeText(url);
+    setCopied(inviteCode);
+    setTimeout(() => setCopied(null), 2000);
   };
 
   const anyDown = statuses.some(
@@ -179,6 +204,53 @@ export function DashboardContent({ user }: { user: User }) {
             />
           </button>
         </div>
+      </div>
+
+      {/* Your Circles */}
+      <div className="rounded-xl border border-card-border bg-card p-6 mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-sm font-mono text-muted uppercase tracking-wider">
+            Your circles
+          </h2>
+          <span className="text-sm text-muted font-mono">
+            {circles.length}
+          </span>
+        </div>
+
+        {circles.length === 0 ? (
+          <p className="text-muted text-sm text-center py-4">
+            No circles yet. They&apos;ll be created automatically.
+          </p>
+        ) : (
+          <div className="space-y-3">
+            {circles.map((circle) => (
+              <div
+                key={circle.id}
+                className="flex items-center justify-between py-3 border-b border-card-border last:border-0"
+              >
+                <div>
+                  <p className="text-sm font-medium">{circle.name}</p>
+                  <p className="text-xs text-muted">
+                    {circle.memberCount}{" "}
+                    {circle.memberCount === 1 ? "member" : "members"}
+                    {circle.isOwner && " · owner"}
+                  </p>
+                </div>
+
+                {circle.isOwner && (
+                  <button
+                    onClick={() => copyInviteLink(circle.inviteCode)}
+                    className="text-xs px-3 py-1.5 rounded-lg border border-card-border hover:border-green hover:text-green transition-colors cursor-pointer"
+                  >
+                    {copied === circle.inviteCode
+                      ? "Copied!"
+                      : "Copy invite link"}
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* People List */}

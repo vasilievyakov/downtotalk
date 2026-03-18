@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
-import { users } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { users, circleMemberships } from "@/db/schema";
+import { eq, and, inArray } from "drizzle-orm";
 
 export async function POST(request: NextRequest) {
   const session = await auth();
@@ -25,8 +25,47 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET() {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  // Find all circles the current user belongs to
+  const myMemberships = await db.query.circleMemberships.findMany({
+    where: eq(circleMemberships.userId, session.user.id),
+    columns: { circleId: true },
+  });
+
+  const circleIds = myMemberships.map((m) => m.circleId);
+
+  if (circleIds.length === 0) {
+    return NextResponse.json({ users: [], count: 0 });
+  }
+
+  // Find all users in those circles
+  const fellowMembers = await db.query.circleMemberships.findMany({
+    where: inArray(circleMemberships.circleId, circleIds),
+    columns: { userId: true },
+  });
+
+  const fellowUserIds = [
+    ...new Set(
+      fellowMembers
+        .map((m) => m.userId)
+        .filter((id) => id !== session.user!.id)
+    ),
+  ];
+
+  if (fellowUserIds.length === 0) {
+    return NextResponse.json({ users: [], count: 0 });
+  }
+
+  // Get available users from circles only
   const available = await db.query.users.findMany({
-    where: eq(users.isAvailable, true),
+    where: and(
+      eq(users.isAvailable, true),
+      inArray(users.id, fellowUserIds)
+    ),
     columns: {
       id: true,
       name: true,

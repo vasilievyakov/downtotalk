@@ -7,6 +7,7 @@ import {
   jsonb,
   integer,
   primaryKey,
+  unique,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccountType } from "next-auth/adapters";
 
@@ -33,6 +34,7 @@ export const users = pgTable("users", {
   monitoredServices: jsonb("monitored_services")
     .$type<string[]>()
     .default(["claude", "openai", "gemini"]),
+  githubAccessToken: text("github_access_token"),
   isAvailable: boolean("is_available").default(false),
   availableSince: timestamp("available_since", { mode: "date" }),
   lastSeenAt: timestamp("last_seen_at", { mode: "date" }),
@@ -120,3 +122,32 @@ export const notifications = pgTable("notifications", {
   sentAt: timestamp("sent_at", { mode: "date" }).defaultNow(),
   readAt: timestamp("read_at", { mode: "date" }),
 });
+
+// ──────────────────────────────────────────
+// Circles (invite-based social graph)
+// ──────────────────────────────────────────
+
+export const circles = pgTable("circles", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  ownerId: uuid("owner_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  inviteCode: text("invite_code").unique().notNull(),
+  createdAt: timestamp("created_at", { mode: "date" }).defaultNow(),
+});
+
+export const circleMemberships = pgTable(
+  "circle_memberships",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    circleId: uuid("circle_id")
+      .notNull()
+      .references(() => circles.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    joinedAt: timestamp("joined_at", { mode: "date" }).defaultNow(),
+  },
+  (table) => [unique().on(table.circleId, table.userId)]
+);
