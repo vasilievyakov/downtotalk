@@ -34,11 +34,17 @@ export async function POST(request: NextRequest) {
   if (isAvailable) {
     const currentUser = await db.query.users.findFirst({
       where: eq(users.id, session.user.id),
-      columns: { name: true },
+      columns: { name: true, telegramHandle: true, whatsappNumber: true, zoomLink: true },
     });
     notifyCircleMembers(
       session.user.id,
-      `${currentUser?.name || "Someone"} is now available to talk.\n\nJoin: downtotalk.vercel.app/dashboard`
+      {
+        name: currentUser?.name || null,
+        telegramHandle: currentUser?.telegramHandle || null,
+        whatsappNumber: currentUser?.whatsappNumber || null,
+        zoomLink: currentUser?.zoomLink || null,
+      },
+      { type: "available" }
     ).catch(() => {}); // fire-and-forget
   }
 

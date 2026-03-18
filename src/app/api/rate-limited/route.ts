@@ -39,13 +39,17 @@ export async function POST(request: NextRequest) {
   // Notify circle members via Telegram
   const currentUser = await db.query.users.findFirst({
     where: eq(users.id, session.user.id),
-    columns: { name: true },
+    columns: { name: true, telegramHandle: true, whatsappNumber: true, zoomLink: true },
   });
-  const serviceName =
-    service === "claude" ? "Claude" : service === "openai" ? "ChatGPT" : "Gemini";
   notifyCircleMembers(
     session.user.id,
-    `${currentUser?.name || "Someone"} is free \u2014 hit the ${serviceName} limit.\n\nJoin: downtotalk.vercel.app/dashboard`
+    {
+      name: currentUser?.name || null,
+      telegramHandle: currentUser?.telegramHandle || null,
+      whatsappNumber: currentUser?.whatsappNumber || null,
+      zoomLink: currentUser?.zoomLink || null,
+    },
+    { type: "rate-limit", service }
   ).catch(() => {}); // fire-and-forget
 
   // Count others who are available (within shared circles only)
