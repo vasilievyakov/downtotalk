@@ -1,18 +1,65 @@
+<div align="center">
+
 # DownToTalk
 
-> When AI sleeps, humans connect.
+**When AI sleeps, humans connect.**
 
-**The app that only works when AI doesn't.** When you hit your Claude, ChatGPT, or Gemini rate limit — you become available to talk to real humans. No scheduling. No planning. Just connect.
+The app that only works when AI doesn't.
 
-## How It Works
+[Live Demo](https://downtotalk.vercel.app) · [Telegram Bot](https://t.me/Downtotalk_bot)
 
-1. **You hit your limit** — One tap on Claude / ChatGPT / Gemini button
+![License](https://img.shields.io/badge/license-MIT-green)
+![Deploy](https://img.shields.io/badge/deploy-Vercel-black)
+![Status](https://img.shields.io/badge/status-live-brightgreen)
+
+</div>
+
+---
+
+<p align="center">
+  <img src="docs/landing.png" width="700" alt="DownToTalk Landing Page" />
+</p>
+
+## The idea
+
+You hit your Claude rate limit. ChatGPT says "try again later." You stare at an error message.
+
+**What if that moment became a reason to talk to another human?**
+
+DownToTalk monitors AI service status in real-time. When you hit your limit, one tap makes you available to your circle. They get a Telegram notification with buttons to reach you directly — no scheduling, no app switching.
+
+## How it works
+
+1. **You hit your limit** — Tap "Claude" / "ChatGPT" / "Gemini"
 2. **Your circle gets notified** — Telegram message with inline contact buttons
-3. **Talk to a human** — Message on Telegram, call on WhatsApp, or join Zoom. Directly from the notification.
+3. **Talk** — One tap to message on Telegram, call on WhatsApp, or join Zoom
 
-## Live Demo
+<p align="center">
+  <img src="docs/landing-mobile.png" width="280" alt="DownToTalk Mobile View" />
+</p>
 
-[downtotalk.vercel.app](https://downtotalk.vercel.app)
+## Live AI Status
+
+DownToTalk shows real-time status of Claude, ChatGPT, and Gemini — pulled from official status pages every 5 minutes.
+
+<p align="center">
+  <img src="docs/status-widget.png" width="500" alt="Live AI Status Widget" />
+</p>
+
+## Architecture
+
+```mermaid
+graph LR
+    A[User hits limit] -->|One tap| B[DownToTalk API]
+    B -->|Save event| C[(Neon DB)]
+    B -->|Fire & forget| D[Telegram Bot]
+    D -->|Inline keyboard| E[Circle members]
+    E -->|Tap button| F[Direct call/chat]
+
+    G[UptimeRobot] -->|Every 5 min| H[/api/status]
+    H -->|RSS/JSON| I[Claude/OpenAI/Gemini]
+    H -->|Status changed?| D
+```
 
 ## Tech Stack
 
@@ -23,43 +70,36 @@
 | Database | Neon (serverless PostgreSQL) |
 | ORM | Drizzle |
 | Auth | NextAuth 5 (GitHub OAuth) |
-| Notifications | Telegram Bot API (inline keyboards) |
-| Status monitoring | RSS parsing (Claude, OpenAI) + Google Cloud JSON (Gemini) |
-| Uptime polling | UptimeRobot (5 min interval) |
+| Notifications | Telegram Bot API |
+| Monitoring | RSS/JSON parsing + UptimeRobot |
 | Hosting | Vercel |
 
-## Features
-
-- **Live AI Status** — Real-time monitoring of Claude, ChatGPT, Gemini via RSS/JSON
-- **One-tap rate limit report** — Per-service buttons, auto-sets you as available
-- **Telegram notifications** — Inline keyboard with contact buttons (Telegram, WhatsApp, Zoom, dashboard)
-- **Outage detection** — Compares status with DB, notifies subscribers on state transitions
-- **Circles** — Invite-based friend groups, auto-created on signup
-- **Availability TTL** — Auto-resets after 2 hours
-- **Profile setup** — Choose which AI services you use, add contact methods
-
-## Development
+## Quick Start
 
 ```bash
+git clone https://github.com/vasilievyakov/downtotalk.git
+cd downtotalk
 npm install
-cp .env.example .env.local  # Add your credentials
+cp .env.example .env.local
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+## Why?
 
-## Environment Variables
-
-| Variable | Description |
-|----------|-------------|
-| `DATABASE_URL` | Neon pooled connection string |
-| `DATABASE_URL_UNPOOLED` | Neon direct connection (for migrations) |
-| `AUTH_SECRET` | NextAuth secret |
-| `AUTH_GITHUB_ID` | GitHub OAuth app ID |
-| `AUTH_GITHUB_SECRET` | GitHub OAuth app secret |
-| `TELEGRAM_BOT_TOKEN` | Telegram bot token (@Downtotalk_bot) |
-| `TELEGRAM_WEBHOOK_SECRET` | Secret for webhook verification |
+> We spend 8 hours a day talking to machines. When the machines stop talking back, we stare at error messages.
+>
+> Claude uptime is 99.64%. But rate limits hit thousands daily. Every limit is an opportunity to remember what screens were originally for — connecting people.
 
 ## License
 
 MIT
+
+---
+
+<div align="center">
+
+**[Try it](https://downtotalk.vercel.app)**
+
+*Built in a weekend. Because sometimes the best thing AI can do is shut up.*
+
+</div>
