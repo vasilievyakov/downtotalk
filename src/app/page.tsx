@@ -1,14 +1,40 @@
+import Link from "next/link";
+import { auth } from "@/lib/auth";
 import { StatusDashboard } from "@/components/status-dashboard";
 import { HowItWorks } from "@/components/how-it-works";
 import { Manifesto } from "@/components/manifesto";
 import { WaitlistForm } from "@/components/waitlist-form";
 import { Footer } from "@/components/footer";
 
-export default function Home() {
+export default async function Home() {
+  const session = await auth();
+
   return (
     <main className="min-h-screen">
+      {/* Nav */}
+      <nav className="max-w-3xl mx-auto px-6 pt-6 flex justify-between items-center">
+        <span className="text-sm font-bold">
+          Down<span className="text-green">To</span>Talk
+        </span>
+        {session ? (
+          <Link
+            href="/dashboard"
+            className="text-sm text-green hover:underline"
+          >
+            Dashboard
+          </Link>
+        ) : (
+          <Link
+            href="/login"
+            className="text-sm text-muted hover:text-foreground transition-colors"
+          >
+            Sign in
+          </Link>
+        )}
+      </nav>
+
       {/* Hero */}
-      <section className="max-w-3xl mx-auto px-6 pt-20 pb-16 text-center">
+      <section className="max-w-3xl mx-auto px-6 pt-16 pb-16 text-center">
         <div className="animate-fade-in-up">
           <p className="text-muted font-mono text-sm tracking-wider uppercase mb-6">
             When AI sleeps, humans connect
@@ -31,9 +57,28 @@ export default function Home() {
         <StatusDashboard />
       </section>
 
-      {/* Waitlist CTA */}
-      <section className="max-w-3xl mx-auto px-6 pb-20 animate-fade-in-up animate-delay-300">
-        <WaitlistForm />
+      {/* Sign up CTA */}
+      <section className="max-w-3xl mx-auto px-6 pb-20 text-center animate-fade-in-up animate-delay-300">
+        {session ? (
+          <Link
+            href="/dashboard"
+            className="inline-block px-8 py-3 rounded-lg bg-green text-background font-medium hover:opacity-90 transition-opacity"
+          >
+            Go to Dashboard
+          </Link>
+        ) : (
+          <div>
+            <Link
+              href="/login"
+              className="inline-block px-8 py-3 rounded-lg bg-green text-background font-medium hover:opacity-90 transition-opacity"
+            >
+              Join — it&apos;s free
+            </Link>
+            <p className="text-muted text-sm mt-3">
+              Sign in with Google or GitHub. We only notify you when AI is down.
+            </p>
+          </div>
+        )}
       </section>
 
       {/* How it works */}
@@ -50,9 +95,18 @@ export default function Home() {
       <section className="max-w-3xl mx-auto px-6 pb-20 text-center animate-fade-in-up animate-delay-600">
         <h2 className="text-2xl font-bold mb-4">Ready for the next outage?</h2>
         <p className="text-muted mb-8">
-          Join the waitlist. We&apos;ll notify you when it&apos;s time to be human.
+          We&apos;ll notify you when it&apos;s time to be human.
         </p>
-        <WaitlistForm />
+        {session ? (
+          <Link
+            href="/dashboard"
+            className="inline-block px-8 py-3 rounded-lg bg-green text-background font-medium hover:opacity-90 transition-opacity"
+          >
+            Go to Dashboard
+          </Link>
+        ) : (
+          <WaitlistForm />
+        )}
       </section>
 
       <Footer />

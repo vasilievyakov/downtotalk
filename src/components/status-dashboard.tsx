@@ -3,45 +3,32 @@
 import { useEffect, useState } from "react";
 
 interface ServiceStatus {
-  name: string;
-  slug: string;
+  service: string;
   status: "operational" | "degraded" | "outage" | "checking";
   statusText: string;
-  url: string;
+  incidentTitle?: string;
 }
 
-const SERVICES: ServiceStatus[] = [
-  {
-    name: "Claude",
-    slug: "claude",
-    status: "checking",
-    statusText: "Checking...",
-    url: "https://status.claude.com",
-  },
-  {
-    name: "ChatGPT",
-    slug: "chatgpt",
-    status: "checking",
-    statusText: "Checking...",
-    url: "https://status.openai.com",
-  },
-  {
-    name: "Gemini",
-    slug: "gemini",
-    status: "checking",
-    statusText: "Checking...",
-    url: "https://status.cloud.google.com",
-  },
-];
+const SERVICE_NAMES: Record<string, string> = {
+  claude: "Claude",
+  openai: "ChatGPT",
+  gemini: "Gemini",
+};
 
-const STATUS_COLORS = {
+const SERVICE_URLS: Record<string, string> = {
+  claude: "https://status.claude.com",
+  openai: "https://status.openai.com",
+  gemini: "https://status.cloud.google.com",
+};
+
+const STATUS_COLORS: Record<string, string> = {
   operational: "bg-green",
   degraded: "bg-yellow",
   outage: "bg-red",
   checking: "bg-muted",
 };
 
-const STATUS_TEXT_COLORS = {
+const STATUS_TEXT_COLORS: Record<string, string> = {
   operational: "text-green",
   degraded: "text-yellow",
   outage: "text-red",
@@ -49,23 +36,32 @@ const STATUS_TEXT_COLORS = {
 };
 
 export function StatusDashboard() {
-  const [services, setServices] = useState<ServiceStatus[]>(SERVICES);
-  const [peopleReady, setPeopleReady] = useState(0);
+  const [services, setServices] = useState<ServiceStatus[]>([
+    { service: "claude", status: "checking", statusText: "Checking..." },
+    { service: "openai", status: "checking", statusText: "Checking..." },
+    { service: "gemini", status: "checking", statusText: "Checking..." },
+  ]);
+  const [availableCount, setAvailableCount] = useState(0);
 
   useEffect(() => {
-    // TODO: Replace with real API call to our backend
-    const timer = setTimeout(() => {
-      setServices((prev) =>
-        prev.map((s) => ({
-          ...s,
-          status: "operational" as const,
-          statusText: "Operational",
-        }))
-      );
-      setPeopleReady(127);
-    }, 1500);
+    const fetchData = async () => {
+      try {
+        const [statusRes, availRes] = await Promise.all([
+          fetch("/api/status"),
+          fetch("/api/availability"),
+        ]);
+        const statusData = await statusRes.json();
+        const availData = await availRes.json();
+        setServices(statusData.statuses);
+        setAvailableCount(availData.count || 0);
+      } catch {
+        // Keep checking state on error
+      }
+    };
 
-    return () => clearTimeout(timer);
+    fetchData();
+    const interval = setInterval(fetchData, 60000);
+    return () => clearInterval(interval);
   }, []);
 
   const anyDown = services.some(
@@ -93,23 +89,25 @@ export function StatusDashboard() {
       <div className="space-y-4">
         {services.map((service) => (
           <div
-            key={service.slug}
+            key={service.service}
             className="flex items-center justify-between py-3 border-b border-card-border last:border-0"
           >
             <div className="flex items-center gap-3">
               <span
                 className={`w-2.5 h-2.5 rounded-full ${
-                  STATUS_COLORS[service.status]
+                  STATUS_COLORS[service.status] || "bg-muted"
                 } ${service.status === "checking" ? "pulse-dot" : ""}`}
               />
-              <span className="font-medium">{service.name}</span>
+              <span className="font-medium">
+                {SERVICE_NAMES[service.service] || service.service}
+              </span>
             </div>
             <a
-              href={service.url}
+              href={SERVICE_URLS[service.service] || "#"}
               target="_blank"
               rel="noopener noreferrer"
               className={`text-sm font-mono ${
-                STATUS_TEXT_COLORS[service.status]
+                STATUS_TEXT_COLORS[service.status] || "text-muted"
               } hover:underline`}
             >
               {service.statusText}
@@ -123,13 +121,13 @@ export function StatusDashboard() {
         {anyDown ? (
           <p className="text-lg">
             <span className="text-green font-bold text-2xl">
-              {peopleReady}
+              {availableCount}
             </span>{" "}
             <span className="text-muted">people are free right now</span>
           </p>
         ) : (
           <p className="text-muted">
-            <span className="font-bold text-foreground">{peopleReady}</span>{" "}
+            <span className="font-bold text-foreground">{availableCount}</span>{" "}
             people ready for the next outage.{" "}
             <span className="text-green">Be one of them.</span>
           </p>
