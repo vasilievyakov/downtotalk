@@ -57,7 +57,6 @@ export function DashboardContent({ user }: { user: User }) {
     othersAvailable: number;
   } | null>(null);
   const [rateLimitLoading, setRateLimitLoading] = useState<string | null>(null);
-  const [selectedService, setSelectedService] = useState("claude");
   const [error, setError] = useState<string | null>(null);
 
   const fetchStatuses = useCallback(async () => {
@@ -303,34 +302,29 @@ export function DashboardContent({ user }: { user: User }) {
           </div>
         ) : (
           <div className="flex gap-2">
-            <select
-              value={selectedService}
-              onChange={(e) => setSelectedService(e.target.value)}
-              className="px-3 py-4 rounded-xl bg-card border border-card-border text-sm font-medium cursor-pointer focus:outline-none focus:border-green"
-            >
-              {(profile?.monitoredServices || ["claude", "openai", "gemini"]).map(
-                (svc) => (
-                  <option key={svc} value={svc}>
-                    {svc === "claude"
-                      ? "Claude"
-                      : svc === "openai"
-                        ? "ChatGPT"
-                        : "Gemini"}
-                  </option>
-                )
-              )}
-            </select>
-            <button
-              onClick={() => reportRateLimit(selectedService)}
-              disabled={rateLimitLoading !== null}
-              className="flex-1 py-4 rounded-xl text-lg font-bold transition-all cursor-pointer disabled:opacity-50"
-              style={{
-                background: "linear-gradient(135deg, #E86235 0%, #E04343 100%)",
-                color: "#fff",
-              }}
-            >
-              {rateLimitLoading ? "..." : "I hit my limit"}
-            </button>
+            {(profile?.monitoredServices || ["claude"]).map((svc) => {
+              const name =
+                svc === "claude"
+                  ? "Claude"
+                  : svc === "openai"
+                    ? "ChatGPT"
+                    : "Gemini";
+              return (
+                <button
+                  key={svc}
+                  onClick={() => reportRateLimit(svc)}
+                  disabled={rateLimitLoading !== null}
+                  className="flex-1 py-4 rounded-xl text-lg font-bold transition-all cursor-pointer disabled:opacity-50"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, #E86235 0%, #E04343 100%)",
+                    color: "#fff",
+                  }}
+                >
+                  {rateLimitLoading === svc ? "..." : name}
+                </button>
+              );
+            })}
           </div>
         )}
       </div>
