@@ -236,7 +236,7 @@ export function DashboardContent({ user }: { user: User }) {
       )}
 
       {/* Telegram notification banner */}
-      {profile && !showProfile && (
+      {profile && (
         profile.telegramChatId ? (
           <div className="rounded-xl border border-green/30 bg-green/5 p-4 mb-6 flex items-center gap-3">
             <span className="text-green">&#10003;</span>
