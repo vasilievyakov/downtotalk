@@ -146,19 +146,6 @@ export function DashboardContent({ user }: { user: User }) {
     }
   };
 
-  const shareOnX = (service: string) => {
-    const serviceName =
-      service === "claude"
-        ? "Claude"
-        : service === "openai"
-          ? "ChatGPT"
-          : "Gemini";
-    const ogUrl = `${window.location.origin}/api/og?event=rate-limited&service=${service}`;
-    const text = `I just got rate-limited by ${serviceName}. Time to talk to humans instead.`;
-    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(window.location.origin)}`;
-    window.open(url, "_blank");
-  };
-
   const toggleCircle = async (circleId: string) => {
     if (expandedCircle === circleId) {
       setExpandedCircle(null);
@@ -197,6 +184,12 @@ export function DashboardContent({ user }: { user: User }) {
     degraded: "text-yellow",
     outage: "text-red",
     checking: "text-muted",
+  };
+
+  const SERVICE_NAME: Record<string, string> = {
+    claude: "Claude",
+    openai: "OpenAI",
+    gemini: "Gemini",
   };
 
   return (
@@ -287,7 +280,7 @@ export function DashboardContent({ user }: { user: User }) {
                 <span
                   className={`w-2.5 h-2.5 rounded-full ${STATUS_DOT[s.status] || "bg-muted"}`}
                 />
-                <span className="capitalize font-medium">{s.service}</span>
+                <span className="font-medium">{SERVICE_NAME[s.service] || s.service}</span>
               </div>
               <span
                 className={`text-sm font-mono ${STATUS_TEXT[s.status] || "text-muted"}`}
@@ -302,39 +295,40 @@ export function DashboardContent({ user }: { user: User }) {
       {/* I hit my limit */}
       <div className="mb-6">
         {rateLimitConfirm ? (
-          <div className="rounded-xl border border-green/30 bg-green/5 p-6 text-center">
-            <p className="text-green font-medium">
-              You&apos;re free to talk.{" "}
-              {rateLimitConfirm.othersAvailable > 0
-                ? `${rateLimitConfirm.othersAvailable} ${rateLimitConfirm.othersAvailable === 1 ? "other is" : "others are"} free too.`
-                : "Be the first one online!"}
+          <div className="rounded-xl bg-foreground p-6 text-center">
+            <p className="text-background font-medium text-lg">
+              You hit your {SERVICE_NAME[rateLimitConfirm.service] || rateLimitConfirm.service} limit.
+            </p>
+            <p className="text-background/70 mt-1">
+              {rateLimitConfirm.othersAvailable > 0 ? (
+                <button
+                  onClick={() => document.getElementById("people-section")?.scrollIntoView({ behavior: "smooth" })}
+                  className="underline underline-offset-2 hover:text-background transition-colors cursor-pointer"
+                >
+                  {rateLimitConfirm.othersAvailable} {rateLimitConfirm.othersAvailable === 1 ? "other is" : "others are"} free too ↓
+                </button>
+              ) : (
+                "You\u2019re the first one online!"
+              )}
             </p>
           </div>
         ) : (
           <div className="flex gap-2">
-            {(profile?.monitoredServices || ["claude"]).map((svc) => {
-              const name =
-                svc === "claude"
-                  ? "Claude"
-                  : svc === "openai"
-                    ? "ChatGPT"
-                    : "Gemini";
-              return (
-                <button
-                  key={svc}
-                  onClick={() => reportRateLimit(svc)}
-                  disabled={rateLimitLoading !== null}
-                  className="flex-1 py-4 rounded-xl text-lg font-bold transition-all cursor-pointer disabled:opacity-50"
-                  style={{
-                    background:
-                      "linear-gradient(135deg, #E86235 0%, #E04343 100%)",
-                    color: "#fff",
-                  }}
-                >
-                  {rateLimitLoading === svc ? "..." : name}
-                </button>
-              );
-            })}
+            {(profile?.monitoredServices || ["claude"]).map((svc) => (
+              <button
+                key={svc}
+                onClick={() => reportRateLimit(svc)}
+                disabled={rateLimitLoading !== null}
+                className="flex-1 py-4 rounded-xl text-lg font-bold transition-all cursor-pointer disabled:opacity-50"
+                style={{
+                  background:
+                    "linear-gradient(135deg, #E86235 0%, #E04343 100%)",
+                  color: "#fff",
+                }}
+              >
+                {rateLimitLoading === svc ? "..." : SERVICE_NAME[svc] || svc}
+              </button>
+            ))}
           </div>
         )}
       </div>
@@ -342,26 +336,36 @@ export function DashboardContent({ user }: { user: User }) {
       {/* Availability Toggle */}
       <div className="rounded-xl border border-card-border bg-card p-6 mb-6">
         <div className="flex items-center justify-between">
-          <div>
-            <h2 className="font-medium mb-1">Your availability</h2>
-            <p className="text-sm text-muted">
-              {isAvailable
-                ? "You're visible to others. Someone might reach out!"
-                : "Toggle on to let others know you're free to talk."}
-            </p>
-          </div>
-          <button
-            onClick={toggleAvailability}
-            className={`relative w-14 h-7 rounded-full transition-colors cursor-pointer ${
-              isAvailable ? "bg-green" : "bg-card-border"
-            }`}
-          >
-            <span
-              className={`absolute top-0.5 w-6 h-6 rounded-full bg-foreground transition-transform ${
-                isAvailable ? "left-7.5" : "left-0.5"
-              }`}
-            />
-          </button>
+          {isAvailable ? (
+            <>
+              <p className="text-sm">
+                You&apos;re visible to others
+              </p>
+              <button
+                onClick={toggleAvailability}
+                className="text-sm text-muted hover:text-red transition-colors cursor-pointer"
+              >
+                Turn off
+              </button>
+            </>
+          ) : (
+            <>
+              <div>
+                <h2 className="font-medium mb-1">Your availability</h2>
+                <p className="text-sm text-muted">
+                  Let others know you&apos;re free to talk.
+                </p>
+              </div>
+              <button
+                onClick={toggleAvailability}
+                className={`relative w-14 h-7 rounded-full transition-colors cursor-pointer bg-card-border`}
+              >
+                <span
+                  className="absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-foreground transition-transform"
+                />
+              </button>
+            </>
+          )}
         </div>
       </div>
 
@@ -445,7 +449,9 @@ export function DashboardContent({ user }: { user: User }) {
       </div>
 
       {/* People List */}
-      <PeopleList currentUserId={user.id} />
+      <div id="people-section">
+        <PeopleList currentUserId={user.id} />
+      </div>
     </main>
   );
 }
