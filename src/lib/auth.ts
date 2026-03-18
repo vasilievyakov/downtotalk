@@ -14,17 +14,19 @@ function generateInviteCode(): string {
   return code;
 }
 
-async function ensureDefaultCircle(userId: string): Promise<string> {
+async function ensureDefaultCircle(userId: string, userName?: string | null): Promise<string> {
   const existing = await db.query.circles.findFirst({
     where: eq(circles.ownerId, userId),
   });
   if (existing) return existing.id;
 
+  const circleName = userName ? `${userName}'s circle` : "My circle";
+
   const [circle] = await db
     .insert(circles)
     .values({
       ownerId: userId,
-      name: "My network",
+      name: circleName,
       inviteCode: generateInviteCode(),
     })
     .returning();
@@ -154,7 +156,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           .returning();
 
         // Create default circle for new user
-        await ensureDefaultCircle(newUser.id);
+        await ensureDefaultCircle(newUser.id, newUser.name);
 
         // Import GitHub social graph for new users
         if (
@@ -191,7 +193,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         }
 
         // Ensure default circle exists for existing users
-        await ensureDefaultCircle(existing.id);
+        await ensureDefaultCircle(existing.id, existing.name);
       }
 
       return true;

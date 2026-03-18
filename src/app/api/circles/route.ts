@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
-import { circles, circleMemberships } from "@/db/schema";
+import { circles, circleMemberships, users } from "@/db/schema";
 import { eq, sql } from "drizzle-orm";
 
 function generateInviteCode(): string {
@@ -29,11 +29,20 @@ export async function GET() {
 
   // Auto-create default circle if user has none
   if (memberships.length === 0) {
+    // Get user name for circle naming
+    const user = await db.query.users.findFirst({
+      where: eq(users.id, session.user.id),
+      columns: { name: true },
+    });
+    const circleName = user?.name
+      ? `${user.name}'s circle`
+      : `${session.user.name || session.user.email || "My"}'s circle`;
+
     const [circle] = await db
       .insert(circles)
       .values({
         ownerId: session.user.id,
-        name: "My network",
+        name: circleName,
         inviteCode: generateInviteCode(),
       })
       .returning();
