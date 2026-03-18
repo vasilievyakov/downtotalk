@@ -27,7 +27,16 @@ export function ProfileSetup({
   const [whatsapp, setWhatsapp] = useState(profile?.whatsappNumber || "");
   const [zoom, setZoom] = useState(profile?.zoomLink || "");
   const [city, setCity] = useState(profile?.city || "");
+  const [services, setServices] = useState<string[]>(
+    profile?.monitoredServices?.length ? profile.monitoredServices : ["claude"]
+  );
   const [saving, setSaving] = useState(false);
+
+  const toggleService = (svc: string) => {
+    setServices((prev) =>
+      prev.includes(svc) ? prev.filter((s) => s !== svc) : [...prev, svc]
+    );
+  };
 
   const handleSave = async () => {
     setSaving(true);
@@ -46,6 +55,7 @@ export function ProfileSetup({
         city: city || null,
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         preferredPlatforms: platforms.length > 0 ? platforms : ["telegram"],
+        monitoredServices: services.length > 0 ? services : ["claude"],
       }),
     });
 
@@ -61,6 +71,32 @@ export function ProfileSetup({
       </p>
 
       <div className="space-y-3">
+        <div>
+          <label className="text-xs text-muted block mb-2">
+            Which AI do you use?
+          </label>
+          <div className="flex gap-2">
+            {[
+              { id: "claude", label: "Claude" },
+              { id: "openai", label: "ChatGPT" },
+              { id: "gemini", label: "Gemini" },
+            ].map((svc) => (
+              <button
+                key={svc.id}
+                type="button"
+                onClick={() => toggleService(svc.id)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer border ${
+                  services.includes(svc.id)
+                    ? "bg-green/10 border-green text-green"
+                    : "bg-background border-card-border text-muted hover:border-foreground/30"
+                }`}
+              >
+                {svc.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div>
           <label className="text-xs text-muted block mb-1">
             Telegram username
