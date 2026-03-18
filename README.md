@@ -1,148 +1,146 @@
-<div align="center">
+<h1 align="center">DownToTalk</h1>
 
-<br>
+<p align="center">
+  <em>The app that only works when AI doesn't.<br>When Claude, ChatGPT, or Gemini goes down — talk to a human instead.</em>
+</p>
 
-# Down**To**Talk
+<p align="center">
+  <a href="https://downtotalk.vercel.app"><strong>Live Demo →</strong></a>
+</p>
 
-### The app that only works when AI doesn't.
+<p align="center">
+  <a href="https://github.com/vasilievyakov/downtotalk/blob/main/LICENSE">
+    <img src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square" alt="License: MIT" />
+  </a>
+  <img src="https://img.shields.io/badge/Monitoring-Claude%20·%20ChatGPT%20·%20Gemini-8A2BE2?style=flat-square" alt="3 AI Services" />
+  <img src="https://img.shields.io/badge/Notifications-Telegram%20Bot-26A5E4?style=flat-square" alt="Telegram Bot" />
+  <img src="https://img.shields.io/badge/Status-Live-brightgreen?style=flat-square" alt="Live" />
+</p>
 
-When Claude, ChatGPT, or Gemini goes down — or you hit your rate limit — DownToTalk connects you with real humans for spontaneous conversations. No scheduling. No planning. Just talk.
-
-<br>
-
-[**Try it live →**](https://downtotalk.vercel.app)
-
-<br>
-
-![License](https://img.shields.io/badge/license-MIT-green)
-![Status](https://img.shields.io/badge/status-live-brightgreen)
-![AI Services](https://img.shields.io/badge/monitoring-Claude%20·%20ChatGPT%20·%20Gemini-blue)
-![Notifications](https://img.shields.io/badge/notifications-Telegram%20Bot-26A5E4)
-
-<br>
-
-<img src="docs/hero.png" width="800" alt="DownToTalk — Live AI Status Dashboard" />
-
-</div>
-
-<br>
+<p align="center">
+  <img src="https://img.shields.io/github/stars/vasilievyakov/downtotalk?style=flat-square&label=Stars" alt="GitHub Stars" />
+  <img src="https://img.shields.io/github/last-commit/vasilievyakov/downtotalk?style=flat-square&label=Last%20Commit" alt="Last Commit" />
+</p>
 
 ---
 
-<br>
+## Two Moments
 
-## The quiet moment
+<table>
+<tr>
+<td width="50%" valign="top">
 
-You're deep in a conversation with Claude. Debugging a gnarly issue. Building something important. Then:
+<h3 align="center">The quiet moment</h3>
 
-```
-Rate limit exceeded. Please try again later.
-```
+<p align="center"><em>Personal. Just you.</em></p>
 
-It's just you. Nobody else knows. You stare at the screen, refresh, wait. Your friend — three time zones away — hit the same wall ten minutes ago. She's doing the same thing right now: staring, refreshing, waiting. Alone.
-
-**With DownToTalk:** you tap "Claude" on the dashboard. One tap. Your circle gets a Telegram message:
+You're deep in a conversation with Claude. Debugging a gnarly issue. Then:
 
 ```
-┌──────────────────────────────────────┐
-│  Alex is free — hit the Claude       │
-│  limit.                              │
-│                                      │
-│  Reach out while they're waiting!    │
-│                                      │
-│  [Message on Telegram]               │
-│  [Call on WhatsApp]                  │
-│  [Open dashboard]                    │
-└──────────────────────────────────────┘
+Rate limit exceeded.
+Please try again later.
 ```
 
-One more tap — you're talking. The dead moment becomes a human one.
+Nobody else knows. You stare, refresh, wait. Your friend — three time zones away — hit the same wall ten minutes ago.
 
-<br>
+**You tap "Claude" on the dashboard. One tap.**
 
-## The big moment
+Your circle gets a Telegram message with buttons to reach you directly. One more tap — you're talking.
 
-Then there's the other kind. The one that hits everyone at once.
+The dead moment becomes a human one.
+
+</td>
+<td width="50%" valign="top">
+
+<h3 align="center">The big moment</h3>
+
+<p align="center"><em>Collective. Everyone at once.</em></p>
 
 ```
 Claude.ai — Major Outage
-Identified — We are experiencing elevated error rates across all services.
+Elevated error rates across
+all services.
 ```
 
-Thousands of people. Same moment. All stuck. Twitter explodes. Status page refreshes spike. Everyone waits alone — together.
+Thousands of people. Same moment. All stuck. Twitter explodes. Everyone waits alone — together.
 
-**With DownToTalk:** we detect it automatically. Every 5 minutes, we check the official status pages of Claude, ChatGPT, and Gemini. When a service goes from operational to degraded or outage — your circle gets notified. No button needed. No action required from you.
+**We detect it automatically.** Every 5 minutes, we check official status pages. When a service goes down — your circle gets notified. No button needed.
 
-Your friend's phone buzzes: *"Claude is down. 12 people free right now."* She taps "Open dashboard," sees who's available, picks up a call. A 4-hour outage becomes a 4-hour conversation.
+Your friend's phone buzzes. She taps a button, sees who's available, picks up a call. A 4-hour outage becomes a 4-hour conversation.
 
-> The average AI outage lasts **256 minutes**. That's over 4 hours of people staring at error messages — when they could be talking to each other.
+> *Average AI outage: **256 minutes.***
 
-<br>
+</td>
+</tr>
+</table>
 
-## What your friends actually see
+---
+
+## What your friends actually get
 
 <p align="center">
   <img src="docs/telegram-notification.png" width="380" alt="Telegram notification with inline buttons" />
 </p>
 
-<p align="center"><em>Not a link to a dashboard. Not an email you'll read tomorrow.<br>A message with buttons. One tap → you're talking.</em></p>
+<p align="center">
+  <em>Not a link to a dashboard. Not an email you'll read tomorrow.<br>A message with buttons. One tap → you're talking.</em>
+</p>
 
-<br>
+> [!NOTE]
+> Buttons are built dynamically from the sender's profile. If they added Telegram, WhatsApp, and Zoom — all three show up. If they added nothing — a note says so, with a dashboard link as fallback.
 
-## Two triggers, one outcome
+---
 
-| | You hit your limit | Service goes down |
-|---|---|---|
-| **How it fires** | You tap a button on the dashboard | Automatic — we check every 5 min |
-| **Who gets notified** | Your circle | All subscribers of that service |
-| **What they get** | Telegram message with your contact buttons | Telegram alert + dashboard link |
-| **Your action needed** | One tap | None — it just happens |
+## The dashboard
 
-Either way: your friends know you're free, and they can reach you in one tap.
+<p align="center">
+  <img src="docs/hero.png" width="750" alt="DownToTalk Dashboard" />
+</p>
 
-<br>
+<p align="center">
+  <em>Live AI status. No login required. Real-time data from official status pages.</em>
+</p>
 
-## The before and after
+---
 
-```
-Without DownToTalk:                    With DownToTalk:
+## Before and after
 
-You hit a rate limit.                  You hit a rate limit.
-You stare at the screen.               You tap one button.
-You refresh. You wait.                 Your friends get notified.
-                                       Someone messages you.
+<table>
+<tr>
+<td width="50%">
 
-Claude goes down for everyone.         Claude goes down for everyone.
-You check Twitter.                     Your circle already knows.
-You refresh the status page.           Someone's calling you on Zoom.
-You feel stuck and alone.              You have coffee and a conversation.
+<h4 align="center">Without DownToTalk</h4>
 
-The outage ends.                       The outage ends.
-You go back to work.                   You go back to work, but lighter.
-```
+- You hit a rate limit
+- You stare at the screen
+- You refresh. You wait
+- Claude goes down for everyone
+- You check Twitter
+- You refresh the status page
+- You feel stuck and alone
+- The outage ends
+- You go back to work
 
-<br>
+</td>
+<td width="50%">
 
-## What we monitor — and how
+<h4 align="center">With DownToTalk</h4>
 
-We track the **official status pages** of three major AI providers:
+- You hit a rate limit
+- **You tap one button**
+- **Your friends get notified**
+- Claude goes down for everyone
+- **Your circle already knows**
+- **Someone's calling you on Zoom**
+- **You have coffee and a conversation**
+- The outage ends
+- You go back to work, **but lighter**
 
-| Service | Source | Method |
-|---------|--------|--------|
-| Claude | `status.claude.com/history.rss` | RSS feed parsing |
-| ChatGPT | `status.openai.com/history.rss` | RSS feed parsing |
-| Gemini | `status.cloud.google.com/incidents.json` | JSON endpoint |
+</td>
+</tr>
+</table>
 
-[UptimeRobot](https://uptimerobot.com) pings our `/api/status` endpoint every 5 minutes. On each ping:
-
-1. Fetch current status from all three providers
-2. Compare with previous status stored in our database
-3. If status degraded → notify all subscribers of that service via Telegram
-4. If status recovered → no notification (you'll see it on the dashboard)
-
-> **Why RSS and not webhooks?** Because AI providers don't offer outage webhooks. RSS feeds from their status pages are the most reliable public signal available. We parse them, compare with the last known state, and fire notifications only on transitions.
-
-<br>
+---
 
 ## The data
 
@@ -152,32 +150,52 @@ We track the **official status pages** of three major AI providers:
 | Claude.ai uptime (90 days) | 99.38% | status.claude.com |
 | Average incident duration | ~256 min | IsDown.app |
 | Incidents since Oct 2025 | 144 | IsDown.app |
-| Rate limit complaints (daily, Reddit) | Hundreds | r/ClaudeAI, r/ChatGPT |
+| Annual downtime | **31 hours** | Calculated |
+| Rate limit complaints (daily) | Hundreds | r/ClaudeAI, r/ChatGPT |
 | Direct competitors | **Zero** | Market research |
 
-> 99.64% uptime sounds great until you realize that's 1,900 minutes of downtime per year. That's 31 hours. 31 hours of people staring at error messages — when they could be talking to each other.
+> [!TIP]
+> 99.64% uptime sounds great until you realize that's **31 hours of downtime per year.** 31 hours of people staring at error messages — when they could be talking to each other.
 
-<br>
+---
+
+## What we monitor — and how
+
+| Service | Source | Method |
+|---------|--------|--------|
+| Claude | `status.claude.com/history.rss` | RSS feed parsing |
+| ChatGPT | `status.openai.com/history.rss` | RSS feed parsing |
+| Gemini | `status.cloud.google.com/incidents.json` | JSON endpoint |
+
+[UptimeRobot](https://uptimerobot.com) pings `/api/status` every 5 minutes. On each ping:
+
+1. Fetch current status from all three providers
+2. Compare with previous status in the database
+3. Status degraded → notify subscribers via Telegram
+4. Auto-reset availability for users idle > 2 hours
+
+> [!NOTE]
+> **Why RSS and not webhooks?** AI providers don't offer outage webhooks. RSS feeds from their status pages are the most reliable public signal. We parse them, compare with last known state, and notify only on transitions — no spam.
+
+---
 
 ## Public API
-
-We expose a free, unauthenticated endpoint:
 
 ```
 GET https://downtotalk.vercel.app/api/status
 ```
 
-Returns real-time AI service status and how many people are free right now. No API key. Build on it — dashboards, Slack bots, CLI tools, whatever you want.
+Real-time AI service status + how many people are free. **No API key.** Build dashboards, Slack bots, CLI tools — whatever you want.
 
 <details>
-<summary>Example response</summary>
+<summary><strong>Example response</strong></summary>
 
 ```json
 {
   "statuses": [
-    {"service": "claude", "status": "operational", "statusText": "Operational", "lastChecked": "2026-03-18T20:00:00.000Z"},
-    {"service": "openai", "status": "operational", "statusText": "Operational", "lastChecked": "2026-03-18T20:00:00.000Z"},
-    {"service": "gemini", "status": "operational", "statusText": "Operational", "lastChecked": "2026-03-18T20:00:00.000Z"}
+    {"service": "claude", "status": "operational", "statusText": "Operational"},
+    {"service": "openai", "status": "operational", "statusText": "Operational"},
+    {"service": "gemini", "status": "operational", "statusText": "Operational"}
   ],
   "availableCount": 2,
   "timestamp": "2026-03-18T20:00:00.000Z"
@@ -186,7 +204,7 @@ Returns real-time AI service status and how many people are free right now. No A
 
 </details>
 
-<br>
+---
 
 ## What this is — and isn't
 
@@ -194,28 +212,39 @@ Returns real-time AI service status and how many people are free right now. No A
 |---------------|-------------------|
 | A way to find your friends when AI is down | A social network |
 | Telegram notifications with direct contact buttons | A chat app or video platform |
-| Automatic outage detection for Claude, ChatGPT, Gemini | A replacement for status pages |
-| Free, open source, MIT licensed | A SaaS product with plans and pricing |
+| Automatic outage detection | A replacement for status pages |
+| Free, open source, MIT licensed | A SaaS with plans and pricing |
 | Built in a weekend | Built by a team of 50 |
 
-<br>
+---
 
 ## Architecture
 
-```
-User hits limit ──→ Next.js API ──→ Neon Postgres
-                         │
-                         ├──→ Telegram Bot (inline keyboard)
-                         │         │
-                         │         └──→ Circle members get notified
-                         │
-UptimeRobot (5 min) ──→ /api/status ──→ RSS/JSON (Claude, ChatGPT, Gemini)
-                              │
-                              └──→ Status changed? ──→ Notify subscribers
+```mermaid
+graph LR
+    A[User hits limit] -->|One tap| B[Next.js API]
+    B --> C[(Neon Postgres)]
+    B -->|Fire & forget| D[Telegram Bot]
+    D -->|Inline keyboard| E[Circle members]
+    E -->|One tap| F[Call or Chat]
+
+    G[UptimeRobot] -->|Every 5 min| H[Status endpoint]
+    H -->|RSS, JSON| I[Claude, ChatGPT, Gemini]
+    H -->|Status changed?| D
+
+    style A fill:#1e1e2e,stroke:#f38ba8,color:#f38ba8
+    style B fill:#1e1e2e,stroke:#89b4fa,color:#89b4fa
+    style C fill:#1e1e2e,stroke:#a6e3a1,color:#a6e3a1
+    style D fill:#1e1e2e,stroke:#26A5E4,color:#26A5E4
+    style E fill:#1e1e2e,stroke:#cba6f7,color:#cba6f7
+    style F fill:#1e1e2e,stroke:#a6e3a1,color:#a6e3a1
+    style G fill:#1e1e2e,stroke:#f9e2af,color:#f9e2af
+    style H fill:#1e1e2e,stroke:#89b4fa,color:#89b4fa
+    style I fill:#1e1e2e,stroke:#fab387,color:#fab387
 ```
 
 <details>
-<summary>Stack details</summary>
+<summary><strong>Stack details</strong></summary>
 
 | Layer | Technology | Why |
 |-------|-----------|-----|
@@ -224,20 +253,20 @@ UptimeRobot (5 min) ──→ /api/status ──→ RSS/JSON (Claude, ChatGPT, G
 | Database | Neon (serverless PostgreSQL) | Scales to zero, generous free tier |
 | ORM | Drizzle | Type-safe, lightweight |
 | Auth | NextAuth 5 (GitHub OAuth) | Developer audience |
-| Notifications | Telegram Bot API | Inline keyboards, zero friction, no app install |
-| Monitoring | UptimeRobot (free) | Reliable external cron every 5 min |
+| Notifications | Telegram Bot API | Inline keyboards, no app install needed |
+| Monitoring | UptimeRobot (free) | Reliable external cron, 5 min interval |
 | Hosting | Vercel (Hobby) | Free, auto-deploy from GitHub |
 
 </details>
 
 <details>
-<summary>Key technical decisions</summary>
+<summary><strong>Key technical decisions</strong></summary>
 
 **Why Telegram, not email or push notifications?**
-Telegram has inline keyboard buttons. One tap from the notification → you're in a conversation. Email can't do that. Browser push notifications don't support actions. Telegram gives us an app-like experience without building an app.
+Telegram has inline keyboard buttons. One tap from the notification → you're in a conversation. Email can't do that. Browser push notifications don't support rich actions. Telegram gives us an app-like experience without building an app.
 
 **Why UptimeRobot, not Vercel Cron?**
-Vercel Hobby plan limits cron jobs to once per day. We need checks every 5 minutes. UptimeRobot is free, reliable, and pings our endpoint on schedule. Simple.
+Vercel Hobby plan limits cron jobs to once per day. We need checks every 5 minutes. UptimeRobot is free, reliable, and pings our endpoint on schedule.
 
 **Why circles, not a public feed?**
 You don't want strangers calling you when Claude goes down. You want your friends. Circles are invite-only groups — you control who sees your availability.
@@ -247,26 +276,26 @@ Without it, people who toggle "available" and forget about it stay visible forev
 
 </details>
 
-<br>
+---
 
 ## Get started
 
-**As a user:** Visit **[downtotalk.vercel.app](https://downtotalk.vercel.app)**, sign in with GitHub, choose your AI services, connect Telegram. Done.
+**As a user:** Visit **[downtotalk.vercel.app](https://downtotalk.vercel.app)** → sign in with GitHub → choose your AI services → connect Telegram. Done.
 
 **As a developer:**
 
 ```bash
-git clone https://github.com/vasilievyakov/downtotalk.git && cd downtotalk
-npm install && cp .env.example .env.local && npm run dev
+git clone https://github.com/vasilievyakov/downtotalk.git
+cd downtotalk && npm install && cp .env.example .env.local && npm run dev
 ```
 
 <details>
-<summary>Environment variables</summary>
+<summary><strong>Environment variables</strong></summary>
 
 | Variable | Description |
 |----------|-------------|
 | `DATABASE_URL` | Neon pooled connection string |
-| `DATABASE_URL_UNPOOLED` | Neon direct connection (migrations) |
+| `DATABASE_URL_UNPOOLED` | Neon direct connection (for migrations) |
 | `AUTH_SECRET` | NextAuth secret |
 | `AUTH_GITHUB_ID` | GitHub OAuth app ID |
 | `AUTH_GITHUB_SECRET` | GitHub OAuth app secret |
@@ -275,28 +304,25 @@ npm install && cp .env.example .env.local && npm run dev
 
 </details>
 
-<br>
+---
+
+## Why I built this
+
+Claude went down during a deadline. I sat there refreshing the status page for twenty minutes. Then I realized — my friend was probably doing the same thing right now, three time zones away. We could have just talked.
+
+Rate limits hit thousands of people daily. Every one of those moments is a person sitting alone in front of a screen, waiting for a machine to come back. What if that moment connected them instead?
 
 ---
 
-<div align="center">
+<p align="center">
+  <em>We spend 8 hours a day talking to machines.<br>
+  When the machines stop talking back, we stare at error messages.</em>
+</p>
 
-<br>
+<p align="center">
+  <strong><a href="https://downtotalk.vercel.app">downtotalk.vercel.app</a></strong>
+</p>
 
-> *We spend 8 hours a day talking to machines.*
-> *When the machines stop talking back, we stare at error messages.*
->
-> *Claude uptime is 99.64%. But rate limits hit thousands daily.*
-> *Every limit is an opportunity to remember what screens were originally for — connecting people.*
-
-<br>
-
-**[downtotalk.vercel.app](https://downtotalk.vercel.app)**
-
-*Built in a weekend with [Claude Code](https://claude.ai/code). Because sometimes the best thing AI can do is shut up.*
-
-<br>
-
-MIT License
-
-</div>
+<p align="center">
+  <em>Built in a weekend with <a href="https://claude.ai/code">Claude Code</a>. Because sometimes the best thing AI can do is shut up.</em>
+</p>
