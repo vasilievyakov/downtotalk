@@ -4,78 +4,75 @@
 
 # Down**To**Talk
 
-### When AI sleeps, humans connect.
-
-The app that only works when AI doesn't.
+### When your AI goes down, your friends go up.
 
 <br>
 
-[**Try it live →**](https://downtotalk.vercel.app)
+[**Try it live →**](https://downtotalk.vercel.app) · [Source](https://github.com/vasilievyakov/downtotalk)
 
 <br>
-
-![License](https://img.shields.io/badge/license-MIT-green)
-![Deploy](https://img.shields.io/badge/deploy-Vercel-black)
-![Status](https://img.shields.io/badge/status-live-brightgreen)
-
-<br>
-
-<img src="docs/hero.png" width="800" alt="DownToTalk — Live AI Status Dashboard" />
 
 </div>
 
+```
+┌──────────────┐       ┌──────────────┐       ┌──────────────────────────┐
+│ Claude says  │       │  One tap:    │       │  Your circle gets a      │
+│ "rate limit  │ ────→ │  "I hit my   │ ────→ │  Telegram notification:  │
+│  exceeded"   │       │   limit"     │       │                          │
+└──────────────┘       └──────────────┘       │  [Message on Telegram]   │
+                                              │  [Call on WhatsApp]      │
+                                              │  [Join Zoom]             │
+                                              └──────────────────────────┘
+```
+
 <br>
 
-## You know the moment.
+## The problem
 
-Claude says *"rate limit exceeded."* ChatGPT says *"try again later."* You stare at an error message and refresh the page.
+```
+Without DownToTalk:                  With DownToTalk:
 
-**DownToTalk turns that dead moment into a human one.**
-
-One tap → your circle knows you're free → they reach you directly on Telegram, WhatsApp, or Zoom. No scheduling. No planning. Just talk.
-
-When a service goes down for everyone — we detect it automatically and notify your circle.
-
-<br>
-
-## One tap. Three buttons. Real conversation.
-
-<p align="center">
-  <img src="docs/telegram-notification.png" width="380" alt="Telegram notification with inline contact buttons" />
-</p>
-
-Your friend hits their Claude limit. You get this in Telegram. One tap — you're talking. That's the whole product.
+Claude is down.                      Claude is down.
+You stare at the screen.             Your friends get notified.
+You refresh every 30 seconds.        Someone messages you.
+You feel stuck and alone.            You have a real conversation.
+```
 
 <br>
 
 ## How it works
 
-```
-You hit "Claude"                    Your circle sees this in Telegram:
-on the dashboard     ──────►        "Nastya is free — hit the Claude limit"
-                                     [Message on Telegram]
-                                     [Call on WhatsApp]
-                                     [Open dashboard]
-```
+🔴 **You hit your limit** — tap Claude, ChatGPT, or Gemini on the dashboard. One tap.
 
-We also monitor AI status pages every 5 minutes. When Claude, ChatGPT, or Gemini goes down — your circle gets notified automatically. No button needed.
+📱 **Your circle gets a Telegram message** — with inline buttons to reach you directly. No app to install.
+
+🗣️ **You talk** — on Telegram, WhatsApp, or Zoom. From the notification. One more tap.
+
+We also monitor AI status pages every 5 minutes. When a service goes down for everyone — your circle gets notified automatically. No button needed.
 
 <br>
 
-## Architecture
+## What it looks like
 
-```mermaid
-graph LR
-    A[User hits limit] -->|One tap| B[API]
-    B --> C[(Neon DB)]
-    B -->|Fire & forget| D[Telegram Bot]
-    D -->|Inline keyboard| E[Circle members]
-    E -->|One tap| F[Call or Chat]
+<p align="center">
+  <img src="docs/telegram-notification.png" width="380" alt="Telegram notification with inline buttons" />
+</p>
 
-    G[UptimeRobot] -->|5 min| H[Status endpoint]
-    H -->|RSS and JSON| I[Claude, ChatGPT, Gemini]
-    H -->|Status changed?| D
-```
+<p align="center"><em>Your friend hits their Claude limit. You get this. One tap — you're talking.</em></p>
+
+<p align="center">
+  <img src="docs/hero.png" width="700" alt="DownToTalk dashboard with live AI status" />
+</p>
+
+<p align="center"><em>Live AI status dashboard. Real-time. No login required.</em></p>
+
+<br>
+
+## Why I built this
+
+Claude went down during a deadline. I sat there refreshing the status page. Then I realized — my friend was probably doing the same thing right now, three time zones away. We could have just... talked.
+
+Rate limits hit thousands of people daily. Claude uptime is 99.64% — but that 0.36% is millions of wasted minutes. Every one of them is a chance to connect with a real person.
 
 <br>
 
@@ -85,7 +82,7 @@ graph LR
 GET https://downtotalk.vercel.app/api/status
 ```
 
-Returns real-time AI service status + how many people are free. No API key. Build on it.
+Returns real-time AI service status + how many people are free right now. No API key. Build on it.
 
 <details>
 <summary>Example response</summary>
@@ -106,18 +103,39 @@ Returns real-time AI service status + how many people are free. No API key. Buil
 
 <br>
 
-## Stack
+## Get started
 
-Next.js 16 · React 19 · Tailwind 4 · Drizzle · Neon Postgres · NextAuth 5 · Telegram Bot API · UptimeRobot · Vercel
+Visit **[downtotalk.vercel.app](https://downtotalk.vercel.app)**, sign in with GitHub. Done.
 
-<br>
-
-## Quick Start
+Want to run it locally?
 
 ```bash
 git clone https://github.com/vasilievyakov/downtotalk.git && cd downtotalk
 npm install && cp .env.example .env.local && npm run dev
 ```
+
+<br>
+
+## Architecture
+
+```
+User hits limit ──→ Next.js API ──→ Neon Postgres
+                         │
+                         ├──→ Telegram Bot (inline keyboard)
+                         │         │
+                         │         └──→ Circle members get notified
+                         │
+UptimeRobot (5 min) ──→ /api/status ──→ RSS/JSON (Claude, ChatGPT, Gemini)
+                              │
+                              └──→ Status changed? ──→ Notify subscribers
+```
+
+<details>
+<summary>Full stack</summary>
+
+Next.js 16 · React 19 · Tailwind CSS 4 · Drizzle ORM · Neon Postgres · NextAuth 5 · Telegram Bot API · UptimeRobot · Vercel
+
+</details>
 
 <br>
 
@@ -130,15 +148,12 @@ npm install && cp .env.example .env.local && npm run dev
 > *We spend 8 hours a day talking to machines.*
 > *When the machines stop talking back, we stare at error messages.*
 >
-> *Claude uptime is 99.64%. But rate limits hit thousands daily.*
-> *Every limit is an opportunity to remember what screens were originally for — connecting people.*
+> *What if we talked to each other instead?*
 
 <br>
 
 **[downtotalk.vercel.app](https://downtotalk.vercel.app)**
 
 *Built in a weekend. Because sometimes the best thing AI can do is shut up.*
-
-<br>
 
 </div>
