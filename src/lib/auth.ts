@@ -5,8 +5,28 @@ import { db } from "@/db";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
+const providers = [];
+
+if (process.env.AUTH_GOOGLE_ID && process.env.AUTH_GOOGLE_SECRET) {
+  providers.push(
+    Google({
+      clientId: process.env.AUTH_GOOGLE_ID,
+      clientSecret: process.env.AUTH_GOOGLE_SECRET,
+    })
+  );
+}
+
+if (process.env.AUTH_GITHUB_ID && process.env.AUTH_GITHUB_SECRET) {
+  providers.push(
+    GitHub({
+      clientId: process.env.AUTH_GITHUB_ID,
+      clientSecret: process.env.AUTH_GITHUB_SECRET,
+    })
+  );
+}
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  providers: [Google, GitHub],
+  providers,
   session: { strategy: "jwt" },
   pages: {
     signIn: "/login",
@@ -15,7 +35,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async signIn({ user, profile }) {
       if (!user.email) return false;
 
-      // Upsert user in our DB
       const existing = await db.query.users.findFirst({
         where: eq(users.email, user.email),
       });
