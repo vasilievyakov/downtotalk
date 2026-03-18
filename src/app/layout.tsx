@@ -1,19 +1,15 @@
 import type { Metadata } from "next";
-import { JetBrains_Mono, Instrument_Serif } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
-const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-jetbrains-mono",
+const geistSans = Geist({
+  variable: "--font-geist-sans",
   subsets: ["latin"],
-  display: "swap",
 });
 
-const instrumentSerif = Instrument_Serif({
-  variable: "--font-instrument-serif",
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
   subsets: ["latin"],
-  weight: "400",
-  style: ["normal", "italic"],
-  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -23,7 +19,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "DownToTalk — When AI sleeps, humans connect",
     description:
-      "The app that only works when AI doesn't.",
+      "The app that only works when AI doesn't. Get matched with real humans for spontaneous calls when AI services go down.",
     type: "website",
   },
   twitter: {
@@ -41,7 +37,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${jetbrainsMono.variable} ${instrumentSerif.variable} antialiased`}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
         {children}
       </body>
     </html>
