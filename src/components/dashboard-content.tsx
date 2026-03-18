@@ -221,49 +221,28 @@ export function DashboardContent({ user }: { user: User }) {
       </div>
 
       {/* I hit my limit */}
-      <div className="rounded-xl border border-card-border bg-card p-6 mb-6">
-        <h2 className="text-sm font-mono text-muted uppercase tracking-wider mb-4">
-          I hit my limit
-        </h2>
-        <div className="grid grid-cols-3 gap-3">
-          <button
-            onClick={() => reportRateLimit("claude")}
-            disabled={rateLimitLoading !== null}
-            className="px-4 py-3 rounded-lg border border-card-border text-sm font-medium transition-colors cursor-pointer hover:border-[#D97706] hover:text-[#D97706] disabled:opacity-50"
-            style={{ borderColor: rateLimitLoading === "claude" ? "#D97706" : undefined }}
-          >
-            {rateLimitLoading === "claude" ? "..." : "Claude limit hit"}
-          </button>
-          <button
-            onClick={() => reportRateLimit("openai")}
-            disabled={rateLimitLoading !== null}
-            className="px-4 py-3 rounded-lg border border-card-border text-sm font-medium transition-colors cursor-pointer hover:border-[#10A37F] hover:text-[#10A37F] disabled:opacity-50"
-          >
-            {rateLimitLoading === "openai" ? "..." : "ChatGPT limit hit"}
-          </button>
-          <button
-            onClick={() => reportRateLimit("gemini")}
-            disabled={rateLimitLoading !== null}
-            className="px-4 py-3 rounded-lg border border-card-border text-sm font-medium transition-colors cursor-pointer hover:border-[#4285F4] hover:text-[#4285F4] disabled:opacity-50"
-          >
-            {rateLimitLoading === "gemini" ? "..." : "Gemini limit hit"}
-          </button>
-        </div>
-        {rateLimitConfirm && (
-          <div className="mt-4 p-3 rounded-lg bg-green/10 border border-green/20">
-            <p className="text-sm text-green">
-              You&apos;re now visible.{" "}
+      <div className="mb-6">
+        {rateLimitConfirm ? (
+          <div className="rounded-xl border border-green/30 bg-green/5 p-6 text-center">
+            <p className="text-green font-medium">
+              You&apos;re free to talk.{" "}
               {rateLimitConfirm.othersAvailable > 0
                 ? `${rateLimitConfirm.othersAvailable} ${rateLimitConfirm.othersAvailable === 1 ? "other is" : "others are"} free too.`
                 : "Be the first one online!"}
             </p>
-            <button
-              onClick={() => shareOnX(rateLimitConfirm.service)}
-              className="mt-2 text-xs px-3 py-1.5 rounded-lg border border-card-border hover:border-foreground transition-colors cursor-pointer"
-            >
-              Share on X
-            </button>
           </div>
+        ) : (
+          <button
+            onClick={() => reportRateLimit("claude")}
+            disabled={rateLimitLoading !== null}
+            className="w-full py-4 rounded-xl text-lg font-bold transition-all cursor-pointer disabled:opacity-50"
+            style={{
+              background: "linear-gradient(135deg, #E86235 0%, #E04343 100%)",
+              color: "#fff",
+            }}
+          >
+            {rateLimitLoading ? "..." : "I hit my limit"}
+          </button>
         )}
       </div>
 
