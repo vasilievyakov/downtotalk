@@ -1,21 +1,21 @@
 const steps = [
   {
     number: "01",
-    title: "AI goes down",
+    title: "AI says wait",
     description:
-      "We monitor Claude, ChatGPT, Gemini, and more. The moment a service goes down, we know.",
+      "Service goes down. Rate limit hits. Claude, ChatGPT, Gemini — doesn't matter which one. You're stuck.",
   },
   {
     number: "02",
-    title: "You get notified",
+    title: "You hit the button",
     description:
-      'Push notification: "Claude is down. 47 people are free right now." Your move.',
+      '"I hit my limit" — one tap, and you\'re visible to people in your circle who are free right now.',
   },
   {
     number: "03",
     title: "Talk to a human",
     description:
-      "See who's available, pick someone, choose your platform — Zoom, Meet, Telegram, WhatsApp. Just connect.",
+      "Pick someone, choose your platform — Telegram, WhatsApp, Zoom. No scheduling. Just connect.",
   },
 ];
 

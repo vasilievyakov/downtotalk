@@ -75,7 +75,7 @@ export default async function Home() {
               Join — it&apos;s free
             </Link>
             <p className="text-muted text-sm mt-3">
-              Sign in with Google or GitHub. We only notify you when AI is down.
+              Sign in with Google or GitHub. Free forever.
             </p>
           </div>
         )}
@@ -95,7 +95,7 @@ export default async function Home() {
       <section className="max-w-3xl mx-auto px-6 pb-20 text-center animate-fade-in-up animate-delay-600">
         <h2 className="text-2xl font-bold mb-4">Ready for the next outage?</h2>
         <p className="text-muted mb-8">
-          We&apos;ll notify you when it&apos;s time to be human.
+          Next time AI says &quot;wait&quot; — don&apos;t. Talk to a human instead.
         </p>
         {session ? (
           <Link
