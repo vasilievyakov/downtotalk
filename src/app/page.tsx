@@ -49,6 +49,9 @@ export default async function Home() {
             When Claude, ChatGPT, or Gemini go down — we match you with real
             humans for spontaneous calls. No scheduling. No planning. Just talk.
           </p>
+          <p className="text-muted text-sm max-w-md mx-auto mt-3">
+            Invite your circle. When AI goes silent, you&apos;ll know who&apos;s free.
+          </p>
         </div>
       </section>
 
@@ -105,7 +108,17 @@ export default async function Home() {
             Go to Dashboard
           </Link>
         ) : (
-          <WaitlistForm />
+          <div>
+            <Link
+              href="/login"
+              className="inline-block px-8 py-3 rounded-lg bg-green text-background font-medium hover:opacity-90 transition-opacity"
+            >
+              Join — it&apos;s free
+            </Link>
+            <p className="text-muted text-sm mt-3">
+              Sign in with GitHub. Invite 5 friends. Done.
+            </p>
+          </div>
         )}
       </section>
 
