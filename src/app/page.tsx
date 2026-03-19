@@ -78,7 +78,7 @@ export default async function Home() {
               Join — it&apos;s free
             </Link>
             <p className="text-muted text-sm mt-3">
-              Sign in with Google or GitHub. Free forever.
+              Sign in with GitHub or Google. Free forever.
             </p>
           </div>
         )}
@@ -116,7 +116,7 @@ export default async function Home() {
               Join — it&apos;s free
             </Link>
             <p className="text-muted text-sm mt-3">
-              Sign in with GitHub. Invite 5 friends. Done.
+              Sign in with GitHub or Google. Invite 5 friends. Done.
             </p>
           </div>
         )}
