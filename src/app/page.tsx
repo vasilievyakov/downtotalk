@@ -3,7 +3,6 @@ import { auth } from "@/lib/auth";
 import { StatusDashboard } from "@/components/status-dashboard";
 import { HowItWorks } from "@/components/how-it-works";
 import { Manifesto } from "@/components/manifesto";
-import { WaitlistForm } from "@/components/waitlist-form";
 import { Footer } from "@/components/footer";
 
 export default async function Home() {
